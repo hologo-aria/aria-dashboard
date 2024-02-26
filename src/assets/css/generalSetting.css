@@ -1,0 +1,61 @@
+.submit-button{
+    /* display: flex; */
+    width: 250px;
+    background-color: #F99417;
+    border-radius: 5px;
+    color: white;
+    border: none; 
+    font-weight: 600;
+    font-size: 16px;
+}
+
+button{
+    height: 40px;
+}
+
+
+.back-next-button{
+    background-color: transparent;
+    border: 2px solid rgb(240, 154, 14);
+    color: black;
+    width: 250px;
+
+    border-radius: 5px;
+
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.form-container{
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+}
+
+/* .submit-button:hover{
+ 
+    background-color: transparent;
+    border: 2px solid rgb(240, 154, 14);
+    color: black;
+} */
+
+.submit-button-container{
+    display: flex;
+    /* border: 1px solid red; */
+    justify-content: right;
+}
+
+
+.card-body{
+display: flex;
+flex-direction: column;
+   
+
+}
+
+
+.dropzone{
+    display: flex;
+   justify-content: center;
+   align-items: center;
+    border: 1px dashed rgb(71, 71, 71);
+}
