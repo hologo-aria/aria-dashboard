@@ -14,30 +14,74 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [organization, setOrganization] = useState([]);
+  const [selectOrg , setSelectOrg] = useState("");
+  const [clusterData,setClusterData] = useState([]);
+  const [deviceData,setDeviceData] = useState([]);
+  const [deviceCount , setDeviceCount] = useState(0);
+  const [clusterCount , setClusterCount] = useState(0);
+  const [activeDevices , setActiveDevices ] = useState(0);
+  const [activeCluster , setActiveClusters ] = useState(0);
 
   async function getDevicesCluster() {
-    axios
-    .get(`http://localhost:5001/api/v1/getorg`)
-    .then((res) => {
-      setOrganization(res.data);
-      console.log(organization);
-    // setUser(res.data[0]);
-    // console.log(res.data[0].city);
-    // axios
-    //   .get(
-    //     `http://localhost:5000/api/v1/destinationFilter/${res.data[0].city}`
-    //   )
-    //   .then((res) => {
-    //     setDealer(res.data);
-    //     console.log(res.data);
-    //     localStorage.setItem("count", res.data.length);
-    //   });
-    });
+    axios.all([
+      axios.get(`http://localhost:5001/api/v1/getorg`),
+      axios.get(`http://localhost:5001/api/v1/getdevice`),
+      axios.get(`http://localhost:5001/api/v1/getcluster`)
+    ])
+   
+    .then(axios.spread((orgResponce,devicesRes,clusterRes) => {
+      setOrganization(orgResponce.data);
+  
+      setClusterData(clusterRes.data);
+      console.log(clusterData);
+  
+      setDeviceData(devicesRes.data);
+      console.log(deviceData);
+      setDeviceCount(devicesRes.data.length);
+      setClusterCount(clusterRes.data.length);
+      setActiveDevices(devicesRes.data.filter(device => device.activeStatus).length);
+      setActiveClusters(clusterRes.data.filter(cluster => cluster.activeStatus).length);
+    
+    }))
   }
 
   useEffect(() => {
     getDevicesCluster();
   }, []);
+
+
+  const handleInputChange = (e) => {
+    setSelectOrg(e.target.value); 
+    
+    if(selectOrg != "all") {
+      axios.all([
+        axios.get(`http://localhost:5001/api/v1/getcluster/dash/${e.target.value}`),
+        axios.get(`http://localhost:5001/api/v1/getdevice/dash/${e.target.value}`)
+      ])
+      .then(axios.spread((clusterRes, devicesRes) => {
+  
+        setClusterData(clusterRes.data);
+        console.log(clusterData);
+ 
+        setDeviceData(devicesRes.data);
+        console.log(deviceData);
+        setDeviceCount(devicesRes.data.length);
+        setClusterCount(clusterRes.data.length);
+        setActiveDevices(devicesRes.data.filter(device => device.activeStatus).length);
+        setActiveClusters(clusterRes.data.filter(cluster => cluster.activeStatus).length);
+  
+      }))
+      .catch(error => {
+        
+        console.error("Error:", error);
+      });
+    }
+    else{
+      getDevicesCluster()
+    }
+
+    
+  };
 
 
 
@@ -65,12 +109,12 @@ const Dashboard = () => {
       <Box className="card-container" >
         <div style={{width:"18rem"}}>
           <Form.Group className="mb-3" controlId="clientname">
-            {/* <Form.Label>Cluster Name</Form.Label> */}
+            <Form.Label>Select Client</Form.Label>
             <Form.Select
               name="clientname"
-              // value={deviceData.clustername} onChange={handleInputChange}
+              value={selectOrg} onChange={handleInputChange}
             >
-              <option value="all">Select Client</option>
+              <option value="all">All</option>
               {organization.map((org, index) => (
                       <option key={index} value={org.organization}>
                         {org.organization}
@@ -79,22 +123,6 @@ const Dashboard = () => {
             </Form.Select>
           </Form.Group>
         </div>
-        {/* <div style={{width:"18rem"}}>
-          <Form.Group className="mb-3" controlId="organization">
-            <Form.Label>Cluster Name</Form.Label>
-            <Form.Select
-              name="organization"
-              value={deviceData.clustername} onChange={handleInputChange}
-            >
-              <option value="">Select Organization</option>
-              {clusterName.map((cluster, index) => (
-                      <option key={index} value={cluster.clustername}>
-                        {cluster.clustername}
-                      </option>
-                    ))}
-            </Form.Select>
-          </Form.Group>
-        </div> */}
       </Box>
       <Box className="card-container">
         <Card style={{ width: "18rem" }}>
@@ -106,10 +134,10 @@ const Dashboard = () => {
             </div>
           </Card.Header>
           <Card.Body>
-            <p className="card-font-style">34</p>
+            <p className="card-font-style">{deviceCount}</p>
             <div className="card-body-style">
-              <div className="active">Active 32</div>
-              <div className="inactive">InActive 2</div>
+              <div className="active">Active {activeDevices}</div>
+              <div className="inactive">InActive {deviceCount-activeDevices}</div>
             </div>
           </Card.Body>
         </Card>
@@ -122,10 +150,10 @@ const Dashboard = () => {
             </div>
           </Card.Header>
           <Card.Body>
-            <p className="card-font-style">6</p>
+            <p className="card-font-style">{clusterCount}</p>
             <div className="card-body-style">
-              <div className="active">Active 4</div>
-              <div className="inactive">InActive 2</div>
+              <div className="active">Active {activeCluster}</div>
+              <div className="inactive">InActive {clusterCount - activeCluster}</div>
             </div>
           </Card.Body>
         </Card>
