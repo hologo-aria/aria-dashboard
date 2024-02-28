@@ -15,7 +15,7 @@ const GeneralSetting = () => {
 
 
 
-  const [cliID, setCliID] = useState("cli001");
+  const [cliID, setCliID] = useState("cli002");
 
   useEffect(() => {
     var date = new Date();

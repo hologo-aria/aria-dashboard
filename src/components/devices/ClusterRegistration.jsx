@@ -7,8 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 function ClusterRegistration({ showModal, handleCloseModal }) {
   const [show, setShow] = useState(showModal);
-  const [ownerID, setOwnerID] = useState("cli001");
+  const [ownerID, setOwnerID] = useState("cli002");
   const [ownerType, setOwnerType] = useState("");
+  const [organization, setOrganization] = useState([]);
 
   const initialFormData = {
     clusterID: "clu001",
@@ -34,7 +35,18 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     }
   };
 
+
+  async function getDevicesCluster() {
+    axios.get(`http://localhost:5001/api/v1/getorg`).then((res) => {
+      setOrganization(res.data);
+      console.log(organization);
+    });
+  }
+
+
+
   useEffect(() => {
+    getDevicesCluster();
     setShow(showModal);
     if (showModal) {
       // Reset clusterData when modal is shown
@@ -95,17 +107,24 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                   />
                 </Form.Group>
               </div>
+              
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Form.Select
                     name="organization"
-                    value={clusterData.organization}
-                    onChange={handleInputChange}
-                  />
+                    value={clusterData.organization} onChange={handleInputChange}
+                  >
+                    <option value="all">Select Organization</option>
+                    {organization.map((org, index) => (
+                      <option key={index} value={org.organization}>
+                        {org.organization}
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </div>
+             
             </div>
             <div className="row">
               <div className="col-md-6">

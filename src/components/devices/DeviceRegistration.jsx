@@ -10,8 +10,9 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   const [ownerID, setOwnerID] = useState("cli001");
   const [ownerType, setOwnerType] = useState("");
   const [clusterName, setClusterName] = useState([]);
-
-
+  const [organization, setOrganization] = useState([]);
+  const [selectedOrg, setSelectedOrg] = useState("");
+  const [clusterBool , setClusterBool] = useState(false) // New state for selected organization
 
   const initialFormData = {
     devicename: "",
@@ -23,7 +24,6 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     deivce_owner_Type: ownerType,
     deivce_owner_id: ownerID,
   };
-
 
   const [deviceData, setDeviceData] = useState(initialFormData);
 
@@ -39,32 +39,17 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     }
   };
 
-  async function getDetails() {
-    axios
-      .get(`http://localhost:5001/api/v1/getcluster/owner/${ownerID}`)
-      .then((res) => {
-        setClusterName(res.data);
-        console.log(clusterName);
-        // setUser(res.data[0]);
-        // console.log(res.data[0].city);
-        // axios
-        //   .get(
-        //     `http://localhost:5000/api/v1/destinationFilter/${res.data[0].city}`
-        //   )
-        //   .then((res) => {
-        //     setDealer(res.data);
-        //     console.log(res.data);
-        //     localStorage.setItem("count", res.data.length);
-        //   });
-      });
+  async function getDevicesCluster() {
+    axios.get(`http://localhost:5001/api/v1/getorg`).then((res) => {
+      setOrganization(res.data);
+      console.log(organization);
+    });
   }
 
-  // useEffect(() => {
-  //   getDetails();
-  // }, []);
+
 
   useEffect(() => {
-    getDetails();
+    getDevicesCluster();
     setShow(showModal);
     if (showModal) {
       // Reset deviceData when modal is shown
@@ -73,14 +58,30 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
         ...prevData,
         deivce_owner_Type: ownerType,
         deivce_owner_id: ownerID,
+        organization: selectedOrg
       }));
     }
-  }, [showModal, ownerID, ownerType]);
+  }, [showModal, ownerID, ownerType,selectedOrg]);
 
   const handleClose = () => {
+    setSelectedOrg("");
+    setClusterName([]);
+    setClusterBool(false);
     setShow(false);
     handleCloseModal();
   };
+
+  const handleOrganizationChange = (e) => {
+    setSelectedOrg(e.target.value); // Update selected organization
+    axios
+      .get(`http://localhost:5001/api/v1/getcluster/owner/${e.target.value}`) // Fetch clusters based on selected organization
+      .then((res) => {
+        setClusterName(res.data);
+        setClusterBool(true);
+        console(clusterName);
+      });
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -140,29 +141,42 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
             </div>
             <div className="row">
               <div className="col-md-6">
-                <Form.Group className="mb-3" controlId="clustername">
-                  <Form.Label>Cluster Name</Form.Label>
-                  <Form.Select name="clustername" value={deviceData.clustername} onChange={handleInputChange}>
-                    <option value="">Select Cluster</option>
-                    {clusterName.map((cluster, index) => (
-                      <option key={index} value={cluster.clustername}>
-                        {cluster.clustername}
+                <Form.Group className="mb-3" controlId="organization">
+                  <Form.Label>Organization</Form.Label>
+                  <Form.Select
+                    name="organization"
+                    value={selectedOrg} onChange={handleOrganizationChange}
+                  >
+                    <option value="all">Select Organization</option>
+                    {organization.map((org, index) => (
+                      <option key={index} value={org.organization}>
+                        {org.organization}
                       </option>
                     ))}
                   </Form.Select>
                 </Form.Group>
               </div>
+              {clusterBool && 
               <div className="col-md-6">
-                <Form.Group className="mb-3" controlId="organization">
-                  <Form.Label>Organization</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="organization"
-                    value={deviceData.organization}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </div>
+              <Form.Group className="mb-3" controlId="clustername">
+                <Form.Label>Cluster Name</Form.Label>
+                <Form.Select
+                  name="clustername"
+                  value={deviceData.clustername}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select Cluster</option>
+                  {clusterName.map((cluster, index) => (
+                    <option key={index} value={cluster.clustername}>
+                      {cluster.clustername}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </div>
+              }
+              
+              
             </div>
             <div className="row">
               <div className="col-md-6">
