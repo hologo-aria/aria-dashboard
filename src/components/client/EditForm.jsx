@@ -4,12 +4,15 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios'; // Import axios for making HTTP requests
 import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup'; 
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 
 function EditForm({ showModal, handleCloseModal, client_ID }) {
   const [show, setShow] = useState(showModal);
   const [clientData, setClientData] = useState([{}]); // State to store client data
   const navigate = useNavigate();
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     setShow(showModal);
@@ -42,18 +45,63 @@ function EditForm({ showModal, handleCloseModal, client_ID }) {
     });
   };
 
-  const handleSubmit = async () => {
-    
-    axios
-      .put(`http://localhost:5001/api/v1/getclient/${client_ID}`, clientData)
-      .then((res) => {
-        handleClose();
-        console.log("Done and dusted");
-         navigate("/team");
-         
+  const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
+  const validationSchema = Yup.object().shape({
+    firstname: Yup.string().required("First name is required"),
+    lastname: Yup.string().required("Last name is required"),
+    organization: Yup.string().required("Organization name is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    mobile: Yup.string()
+    .nullable()
+    .test('is-valid-number', 'Invalid mobile number', function (value, context) {
+      const { country } = context.parent;
+      if (country && value) {
+        const phoneNumber = parsePhoneNumberFromString(value, country);
+        return phoneNumber ? phoneNumber.isValid() : false;
+      }
+      return true; // Allow null or undefined values
+    })
+    .required('Mobile number is required'),
+    country: Yup.string().required('Country is required'),
+    country: Yup.string().required("Country is required"),
+    addressLine: Yup.string()
+      .required("Address line 1 is required")
+      .matches(alphanumericRegex, "Invalid address"),
+    addressLineTwo: Yup.string()
+      .required("Address line 2 is required")
+      .matches(alphanumericRegex, "Invalid address"),
+    timeZone: Yup.string(),
+    zipcode: Yup.number().required("Zip code is required"),
+    accessLevel: Yup.string().required("Access level is required"),
+  });
 
-      });
+  const handleSubmit = async () => {
+    try {
+      // Validate clientData using Yup schema
+      await validationSchema.validate(clientData, { abortEarly: false });
+  
+      // If validation passes, make the API call
+      axios.put(`http://localhost:5001/api/v1/getclient/${client_ID}`, clientData)
+        .then((res) => {
+          handleClose();
+          console.log("Done and dusted");
+          navigate("/team");
+        });
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        // Yup validation error
+        const errors = {};
+        error.inner.forEach((err) => {
+          errors[err.path] = err.message;
+        });
+        setValidationErrors(errors);
+      } else {
+        // Other errors
+        console.error('Error submitting form:', error);
+      }
+    }
   };
+  
 
   if (!clientData) {
     return null; // Return null if client data is not yet fetched
@@ -171,6 +219,13 @@ function EditForm({ showModal, handleCloseModal, client_ID }) {
           <Button variant="secondary" onClick={handleClose}>Close</Button>
           <Button variant="primary" onClick={handleSubmit}>Save Changes</Button>
         </Modal.Footer>
+        {Object.keys(validationErrors).length > 0 && (
+          <div className="alert alert-danger">
+            {Object.values(validationErrors).map((error, index) => (
+              <p key={index}>{error}</p>
+            ))}
+          </div>
+        )}
       </Modal>
     </>
   );

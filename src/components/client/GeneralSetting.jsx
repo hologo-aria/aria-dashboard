@@ -6,16 +6,59 @@ import { useNavigate } from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
+import * as Yup from 'yup';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 import "./../../assets/css/generalSetting.css";
 
 const GeneralSetting = () => {
   const [showGeneralForm, setShowGeneralForm] = useState(true);
   const [adminId, setAdminId] = useState("adm001");
+  const [formErrors, setFormErrors] = useState({});
 
 
 
   const [cliID, setCliID] = useState("cli001");
+  const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
+  const validationSchema = Yup.object().shape({
+    firstname: Yup.string().required("First name is required"),
+    lastname: Yup.string().required("Last name is required"),
+    organization: Yup.string().required("Organization name is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    mobile: Yup.string()
+    .nullable()
+    .test('is-valid-number', 'Invalid mobile number', function (value, context) {
+      const { country } = context.parent;
+      if (country && value) {
+        const phoneNumber = parsePhoneNumberFromString(value, country);
+        return phoneNumber ? phoneNumber.isValid() : false;
+      }
+      return true; // Allow null or undefined values
+    })
+    .required('Mobile number is required'),
+    country: Yup.string().required('Country is required'),
+    country: Yup.string().required("Country is required"),
+    addressLine: Yup.string()
+      .required("Address line 1 is required")
+      .matches(alphanumericRegex, "Invalid address"),
+    addressLineTwo: Yup.string()
+      .required("Address line 2 is required")
+      .matches(alphanumericRegex, "Invalid address"),
+    timeZone: Yup.string(),
+    zipcode: Yup.number().required("Zip code is required"),
+    username: Yup.string().required("Username is required"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]+$/,
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+      ),
+    confirmpassword: Yup.string()
+      .required("Confirm password is required")
+      .oneOf([Yup.ref("password"), null], "Passwords must match"),
+    accessLevel: Yup.string().required("Access level is required"),
+  });
 
   useEffect(() => {
     var date = new Date();
@@ -89,18 +132,35 @@ const GeneralSetting = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
+      // Validate form data using Yup schema
+      await validationSchema.validate(formData, { abortEarly: false });
+  
+      // If validation passes, make the API call
       const response = await axios.post(
         "http://localhost:5001/api/v1/client",
         formData
       );
+  
       console.log("Client created:", response.data);
       setFormData(initialFormData);
       navigate("/team");
     } catch (error) {
-      console.error("Error creating client:", error);
+      if (error.name === 'ValidationError') {
+        // Handle Yup validation errors
+        const validationErrors = {};
+        error.inner.forEach(err => {
+          validationErrors[err.path] = err.message;
+        });
+        console.error("Validation errors:", validationErrors);
+        // Update the state or display error messages accordingly
+      } else {
+        console.error("Error creating client:", error);
+      }
     }
   };
+  
 
   return (
     <div className="form-container">
@@ -111,6 +171,14 @@ const GeneralSetting = () => {
        
         <Typography color="text.primary">Form</Typography>
       </Breadcrumbs>
+      {/* Display form errors */}
+    {Object.keys(formErrors).length > 0 && (
+      <div className="alert alert-danger">
+        {Object.values(formErrors).map((error, index) => (
+          <p key={index}>{error}</p>
+        ))}
+      </div>
+    )}
       {showGeneralForm && (
         <Form className="card-body" onSubmit={handleSubmit}>
           <Row className="mb-8">
