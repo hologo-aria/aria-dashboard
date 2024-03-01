@@ -11,7 +11,7 @@ import "./../../assets/css/generalSetting.css";
 
 const GeneralSetting = () => {
   const [showGeneralForm, setShowGeneralForm] = useState(true);
-  const [adminId, setAdminId] = useState("adm001");
+  const [adminId, setAdminId] = useState("adm002");
   const [countryData, setCountryData] = useState();
 
 
