@@ -35,6 +35,7 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
   const handleClose = () => {
     setShow(false);
     handleCloseModal();
+    setValidationErrors({}); // Reset validation errors
   };
 
   const handleInputChange = (e) => {
@@ -121,7 +122,10 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="firstname">
                   <Form.Label>First Name</Form.Label>
-                  <Form.Control type="text" name="firstname" value={adminData.firstname} onChange={handleInputChange} />
+                  <Form.Control type="text" name="firstname" value={adminData.firstname} onChange={handleInputChange} isInvalid={!!validationErrors.firstname}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.firstname}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -129,13 +133,19 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="lastname">
                   <Form.Label>Last Name</Form.Label>
-                  <Form.Control type="text" name="lastname" value={adminData.lastname} onChange={handleInputChange} />
+                  <Form.Control type="text" name="lastname" value={adminData.lastname} onChange={handleInputChange} isInvalid={!!validationErrors.lastname}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.lastname}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
-                  <Form.Control type="text" name="organization" value={adminData.organization} onChange={handleInputChange} />
+                  <Form.Control type="text" name="organization" value={adminData.organization} onChange={handleInputChange} isInvalid={!!validationErrors.organization}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.organization}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -143,13 +153,19 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
-                  <Form.Control type="email" name="email" value={adminData.email} onChange={handleInputChange} />
+                  <Form.Control type="email" name="email" value={adminData.email} onChange={handleInputChange} isInvalid={!!validationErrors.email}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.email}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="mobile">
                   <Form.Label>Mobile</Form.Label>
-                  <Form.Control type="text" name="mobile" value={adminData.mobile} onChange={handleInputChange} />
+                  <Form.Control type="text" name="mobile" value={adminData.mobile} onChange={handleInputChange} isInvalid={!!validationErrors.mobile}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.mobile}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -157,13 +173,19 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="country">
                   <Form.Label>Country</Form.Label>
-                  <Form.Control type="text" name="country" value={adminData.country} onChange={handleInputChange} />
+                  <Form.Control type="text" name="country" value={adminData.country} onChange={handleInputChange} isInvalid={!!validationErrors.country}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.country}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="addressLine">
                   <Form.Label>Address Line</Form.Label>
-                  <Form.Control type="text" name="addressLine" value={adminData.addressLine} onChange={handleInputChange} />
+                  <Form.Control type="text" name="addressLine" value={adminData.addressLine} onChange={handleInputChange} isInvalid={!!validationErrors.addressLine}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.addressLine}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -171,7 +193,10 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="addressLineTwo">
                   <Form.Label>Address Line 2</Form.Label>
-                  <Form.Control type="text" name="addressLineTwo" value={adminData.addressLineTwo} onChange={handleInputChange} />
+                  <Form.Control type="text" name="addressLineTwo" value={adminData.addressLineTwo} onChange={handleInputChange} isInvalid={!!validationErrors.addressLineTwo}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.addressLineTwo}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
@@ -189,19 +214,25 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="zipcode">
                   <Form.Label>Zip Code</Form.Label>
-                  <Form.Control type="text" name="zipcode" value={adminData.zipcode} onChange={handleInputChange} />
+                  <Form.Control type="text" name="zipcode" value={adminData.zipcode} onChange={handleInputChange} isInvalid={!!validationErrors.zipcode}/>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.zipcode}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="accessLevel">
                   <Form.Label>Access Level</Form.Label>
-                  <Form.Select name="accessLevel" value={adminData.accessLevel} onChange={handleInputChange}>
+                  <Form.Select name="accessLevel" value={adminData.accessLevel} onChange={handleInputChange} isInvalid={!!validationErrors.accessLevel}>
                     
                   <option value="superadmin">Super Admin</option>
                     <option value="admin">Admin</option>
                     <option value="moderator">Moderator</option>
                     <option value="user">User</option>
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.accessLevel}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -218,13 +249,6 @@ function EditForm({ showModal, handleCloseModal, adminID }) {
           <Button variant="secondary" onClick={handleClose}>Close</Button>
           <Button variant="primary" onClick={handleSubmit}>Save Changes</Button>
         </Modal.Footer>
-        {Object.keys(validationErrors).length > 0 && (
-          <div className="alert alert-danger">
-            {Object.values(validationErrors).map((error, index) => (
-              <p key={index}>{error}</p>
-            ))}
-          </div>
-        )}
       </Modal>
     </>
   );

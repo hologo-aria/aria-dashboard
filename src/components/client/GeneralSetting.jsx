@@ -37,7 +37,6 @@ const GeneralSetting = () => {
     })
     .required('Mobile number is required'),
     country: Yup.string().required('Country is required'),
-    country: Yup.string().required("Country is required"),
     addressLine: Yup.string()
       .required("Address line 1 is required")
       .matches(alphanumericRegex, "Invalid address"),
@@ -155,6 +154,7 @@ const GeneralSetting = () => {
         });
         console.error("Validation errors:", validationErrors);
         // Update the state or display error messages accordingly
+        setFormErrors(validationErrors);
       } else {
         console.error("Error creating client:", error);
       }
@@ -171,14 +171,6 @@ const GeneralSetting = () => {
        
         <Typography color="text.primary">Form</Typography>
       </Breadcrumbs>
-      {/* Display form errors */}
-    {Object.keys(formErrors).length > 0 && (
-      <div className="alert alert-danger">
-        {Object.values(formErrors).map((error, index) => (
-          <p key={index}>{error}</p>
-        ))}
-      </div>
-    )}
       {showGeneralForm && (
         <Form className="card-body" onSubmit={handleSubmit}>
           <Row className="mb-8">
@@ -201,24 +193,30 @@ const GeneralSetting = () => {
                       <div className="col-sm-4 mb-3 mb-lg-0">
                         <input
                           type="text"
-                          className="form-control"
+                          className={`form-control ${formErrors.firstname ? 'is-invalid' : ''}`}
                           placeholder="First name"
                           id="firstname"
                           value={formData.firstname}
                           onChange={handleChange}
                           required
                         />
+                        {formErrors.firstname && (
+                        <div className="invalid-feedback">{formErrors.firstname}</div>
+                        )}
                       </div>
                       <div className="col-sm-4">
                         <input
                           type="text"
-                          className="form-control"
+                          className={`form-control ${formErrors.lastname ? 'is-invalid' : ''}`}
                           placeholder="Last name"
                           id="lastname"
                           value={formData.lastname}
                           onChange={handleChange}
                           required
                         />
+                        {formErrors.lastname && (
+                        <div className="invalid-feedback">{formErrors.lastname}</div>
+                        )}
                       </div>
                     </Row>
 
@@ -232,13 +230,16 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="text"
-                          className="form-control"
+                          className={`form-control ${formErrors.organization ? 'is-invalid' : ''}`}
                           placeholder="Organization name"
                           id="organization"
                           value={formData.organization}
                           onChange={handleChange}
                           required
                         />
+                        {formErrors.organization && (
+                        <div className="invalid-feedback">{formErrors.organization}</div>
+                        )}
                       </div>
                     </Row>
 
@@ -252,13 +253,16 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="email"
-                          className="form-control"
+                          className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
                           placeholder="Email"
                           id="email"
                           value={formData.email}
                           onChange={handleChange}
                           required
                         />
+                        {formErrors.email && (
+                        <div className="invalid-feedback">{formErrors.email}</div>
+                        )}
                       </div>
                     </Row>
 
@@ -272,12 +276,15 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="text"
-                          className="form-control"
+                          className={`form-control ${formErrors.mobile ? 'is-invalid' : ''}`}
                           placeholder="mobile"
                           id="mobile"
                           value={formData.mobile}
                           onChange={handleChange}
                         />
+                        {formErrors.mobile && (
+                        <div className="invalid-feedback">{formErrors.mobile}</div>
+                        )}
                       </div>
                     </Row>
 
@@ -293,7 +300,11 @@ const GeneralSetting = () => {
                           options={countryOptions}
                           value={formData.country}
                           onChange={handleChange}
+                          className={`form-control ${formErrors.country ? 'is-invalid' : ''}`}
                         />
+                        {formErrors.country && (
+                        <div className="invalid-feedback">{formErrors.country}</div>
+                        )}
                       </Col>
                     </Row>
 
@@ -308,8 +319,12 @@ const GeneralSetting = () => {
                           id="addressLine"
                           value={formData.addressLine}
                           onChange={handleChange}
+                          className={`form-control ${formErrors.addressLine ? 'is-invalid' : ''}`}
                           required
                         />
+                        {formErrors.addressLine && (
+                        <div className="invalid-feedback">{formErrors.addressLine}</div>
+                        )}
                       </Col>
                     </Row>
 
@@ -324,8 +339,12 @@ const GeneralSetting = () => {
                           id="addressLineTwo"
                           value={formData.addressLineTwo}
                           onChange={handleChange}
+                          className={`form-control ${formErrors.addressLineTwo ? 'is-invalid' : ''}`}
                           required
                         />
+                        {formErrors.addressLineTwo && (
+                        <div className="invalid-feedback">{formErrors.addressLineTwo}</div>
+                        )}
                       </Col>
                     </Row>
 
@@ -341,7 +360,10 @@ const GeneralSetting = () => {
                           options={timeZoneOptions}
                           value={formData.timeZone}
                           onChange={handleChange}
+                          className={`form-control ${formErrors.timeZone ? 'is-invalid' : ''}`}
                         />
+                        {formErrors.timeZone && (<div className="invalid-feedback">{formErrors.timeZone}</div>
+                        )}
                       </Col>
                     </Row>
 
@@ -356,8 +378,12 @@ const GeneralSetting = () => {
                           id="zipcode"
                           value={formData.zipcode}
                           onChange={handleChange}
+                          className={`form-control ${formErrors.zipcode ? 'is-invalid' : ''}`}
                           required
                         />
+                        {formErrors.zipcode && (
+                        <div className="invalid-feedback">{formErrors.zipcode}</div>
+                        )}
                       </Col>
                     </Row>
                   </div>
@@ -419,8 +445,12 @@ const GeneralSetting = () => {
                         id="username"
                         value={formData.username}
                         onChange={handleChange}
+                        className={`form-control ${formErrors.username ? 'is-invalid' : ''}`}
                         required
                       />
+                      {formErrors.username && (
+                      <div className="invalid-feedback">{formErrors.username}</div>
+                      )}
                     </Col>
                   </Row>
 
@@ -435,8 +465,12 @@ const GeneralSetting = () => {
                         id="password"
                         value={formData.password}
                         onChange={handleChange}
+                        className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
                         required
                       />
+                      {formErrors.password && (
+                      <div className="invalid-feedback">{formErrors.password}</div>
+                      )}
                     </Col>
                   </Row>
 
@@ -451,8 +485,12 @@ const GeneralSetting = () => {
                         id="confirmpassword"
                         value={formData.confirmpassword}
                         onChange={handleChange}
+                        className={`form-control ${formErrors.confirmpassword ? 'is-invalid' : ''}`}
                         required
                       />
+                      {formErrors.confirmpassword && (
+                      <div className="invalid-feedback">{formErrors.confirmpassword}</div>
+                      )}
                     </Col>
                     <Col md={{ offset: 4, span: 8 }} xs={12} className="mt-4">
                       <h6 className="mb-1">Password requirements:</h6>
