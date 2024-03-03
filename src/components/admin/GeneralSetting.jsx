@@ -1,14 +1,13 @@
-import React, { useState ,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row, Form, Card } from "react-bootstrap";
 import FormSelect from "../../widgets/form-select/FormSelect";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Typography from '@mui/material/Typography';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import * as Yup from 'yup';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
-
+import Typography from "@mui/material/Typography";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import * as Yup from "yup";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 import "./../../assets/css/generalSetting.css";
 
@@ -18,8 +17,6 @@ const GeneralSetting = () => {
   const [countryData, setCountryData] = useState();
   const [formErrors, setFormErrors] = useState({});
 
-
-
   const [cliID, setCliID] = useState("cli001");
   const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
   const validationSchema = Yup.object().shape({
@@ -28,17 +25,21 @@ const GeneralSetting = () => {
     organization: Yup.string().required("Organization name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     mobile: Yup.string()
-    .nullable()
-    .test('is-valid-number', 'Invalid mobile number', function (value, context) {
-      const { country } = context.parent;
-      if (country && value) {
-        const phoneNumber = parsePhoneNumberFromString(value, country);
-        return phoneNumber ? phoneNumber.isValid() : false;
-      }
-      return true; // Allow null or undefined values
-    })
-    .required('Mobile number is required'),
-    country: Yup.string().required('Country is required'),
+      .nullable()
+      .test(
+        "is-valid-number",
+        "Invalid mobile number",
+        function (value, context) {
+          const { country } = context.parent;
+          if (country && value) {
+            const phoneNumber = parsePhoneNumberFromString(value, country);
+            return phoneNumber ? phoneNumber.isValid() : false;
+          }
+          return true; // Allow null or undefined values
+        }
+      )
+      .required("Mobile number is required"),
+    country: Yup.string().required("Country is required"),
     addressLine: Yup.string()
       .required("Address line 1 is required")
       .matches(alphanumericRegex, "Invalid address"),
@@ -60,8 +61,7 @@ const GeneralSetting = () => {
       .oneOf([Yup.ref("password"), null], "Passwords must match"),
     accessLevel: Yup.string().required("Access level is required"),
   });
-  
-  
+
   useEffect(() => {
     var date = new Date();
     var year = date.getUTCFullYear();
@@ -71,27 +71,29 @@ const GeneralSetting = () => {
     var minutes = date.getUTCMinutes();
     var seconds = date.getUTCSeconds();
     var milliseconds = date.getUTCMilliseconds();
-    
+
     // Create a UTC timestamp from the individual components
-    var utcTimestamp = Date.UTC(year, month, day, hours, minutes, seconds, milliseconds);
-    setCliID("CLI"+ utcTimestamp)
+    var utcTimestamp = Date.UTC(
+      year,
+      month,
+      day,
+      hours,
+      minutes,
+      seconds,
+      milliseconds
+    );
+    setCliID("CLI" + utcTimestamp);
   }, [cliID]);
-
-
 
   const fetchData = async () => {
     try {
       const countries = await axios.get("https://restcountries.com/v3.1/all");
       setCountryData(countries.data);
-      console.log(countryData)
+      console.log(countryData);
     } catch (err) {
       console.log(err);
     }
   };
-
-
-
-
 
   const navigate = useNavigate();
   const initialFormData = {
@@ -173,18 +175,17 @@ const GeneralSetting = () => {
       }
     }
   };
-  
 
   return (
     <div className="form-container">
-       <Breadcrumbs aria-label="breadcrumb">
+      <Breadcrumbs aria-label="breadcrumb">
         <Link underline="hover" color="inherit" href="/admin">
           Admin
         </Link>
-       
+
         <Typography color="text.primary">Form</Typography>
       </Breadcrumbs>
-      
+
       {showGeneralForm && (
         <Form className="card-body" onSubmit={handleSubmit}>
           <Row className="mb-8">
@@ -207,7 +208,9 @@ const GeneralSetting = () => {
                       <div className="col-sm-4 mb-3 mb-lg-0">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.firstname ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.firstname ? "is-invalid" : ""
+                          }`}
                           placeholder="First name"
                           id="firstname"
                           value={formData.firstname}
@@ -215,13 +218,17 @@ const GeneralSetting = () => {
                           required
                         />
                         {formErrors.firstname && (
-                        <div className="invalid-feedback">{formErrors.firstname}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.firstname}
+                          </div>
                         )}
                       </div>
                       <div className="col-sm-4">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.lastname ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.lastname ? "is-invalid" : ""
+                          }`}
                           placeholder="Last name"
                           id="lastname"
                           value={formData.lastname}
@@ -229,7 +236,9 @@ const GeneralSetting = () => {
                           required
                         />
                         {formErrors.lastname && (
-                        <div className="invalid-feedback">{formErrors.lastname}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.lastname}
+                          </div>
                         )}
                       </div>
                     </Row>
@@ -244,7 +253,9 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.organization ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.organization ? "is-invalid" : ""
+                          }`}
                           placeholder="Organization name"
                           id="organization"
                           value={formData.organization}
@@ -252,7 +263,9 @@ const GeneralSetting = () => {
                           required
                         />
                         {formErrors.organization && (
-                        <div className="invalid-feedback">{formErrors.organization}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.organization}
+                          </div>
                         )}
                       </div>
                     </Row>
@@ -267,7 +280,9 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="email"
-                          className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.email ? "is-invalid" : ""
+                          }`}
                           placeholder="Email"
                           id="email"
                           value={formData.email}
@@ -275,7 +290,9 @@ const GeneralSetting = () => {
                           required
                         />
                         {formErrors.email && (
-                        <div className="invalid-feedback">{formErrors.email}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.email}
+                          </div>
                         )}
                       </div>
                     </Row>
@@ -290,14 +307,18 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.mobile ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.mobile ? "is-invalid" : ""
+                          }`}
                           placeholder="mobile"
                           id="mobile"
                           value={formData.mobile}
                           onChange={handleChange}
                         />
                         {formErrors.mobile && (
-                        <div className="invalid-feedback">{formErrors.mobile}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.mobile}
+                          </div>
                         )}
                       </div>
                     </Row>
@@ -314,10 +335,14 @@ const GeneralSetting = () => {
                           options={countryOptions}
                           value={formData.country}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.country ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.country ? "is-invalid" : ""
+                          }`}
                         />
                         {formErrors.country && (
-                        <div className="invalid-feedback">{formErrors.country}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.country}
+                          </div>
                         )}
                       </Col>
                     </Row>
@@ -333,11 +358,15 @@ const GeneralSetting = () => {
                           id="addressLine"
                           value={formData.addressLine}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.addressLine ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.addressLine ? "is-invalid" : ""
+                          }`}
                           required
                         />
                         {formErrors.addressLine && (
-                        <div className="invalid-feedback">{formErrors.addressLine}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.addressLine}
+                          </div>
                         )}
                       </Col>
                     </Row>
@@ -353,11 +382,15 @@ const GeneralSetting = () => {
                           id="addressLineTwo"
                           value={formData.addressLineTwo}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.addressLineTwo ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.addressLineTwo ? "is-invalid" : ""
+                          }`}
                           required
                         />
                         {formErrors.addressLineTwo && (
-                        <div className="invalid-feedback">{formErrors.addressLineTwo}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.addressLineTwo}
+                          </div>
                         )}
                       </Col>
                     </Row>
@@ -374,9 +407,14 @@ const GeneralSetting = () => {
                           options={timeZoneOptions}
                           value={formData.timeZone}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.timeZone ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.timeZone ? "is-invalid" : ""
+                          }`}
                         />
-                        {formErrors.timeZone && (<div className="invalid-feedback">{formErrors.timeZone}</div>
+                        {formErrors.timeZone && (
+                          <div className="invalid-feedback">
+                            {formErrors.timeZone}
+                          </div>
                         )}
                       </Col>
                     </Row>
@@ -392,11 +430,15 @@ const GeneralSetting = () => {
                           id="zipcode"
                           value={formData.zipcode}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.zipcode ? 'is-invalid' : ''}`}
+                          className={`form-control ${
+                            formErrors.zipcode ? "is-invalid" : ""
+                          }`}
                           required
                         />
                         {formErrors.zipcode && (
-                        <div className="invalid-feedback">{formErrors.zipcode}</div>
+                          <div className="invalid-feedback">
+                            {formErrors.zipcode}
+                          </div>
                         )}
                       </Col>
                     </Row>
@@ -460,11 +502,15 @@ const GeneralSetting = () => {
                         id="username"
                         value={formData.username}
                         onChange={handleChange}
-                        className={`form-control ${formErrors.username ? 'is-invalid' : ''}`}
+                        className={`form-control ${
+                          formErrors.username ? "is-invalid" : ""
+                        }`}
                         required
                       />
                       {formErrors.username && (
-                      <div className="invalid-feedback">{formErrors.username}</div>
+                        <div className="invalid-feedback">
+                          {formErrors.username}
+                        </div>
                       )}
                     </Col>
                   </Row>
@@ -480,11 +526,15 @@ const GeneralSetting = () => {
                         id="password"
                         value={formData.password}
                         onChange={handleChange}
-                        className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
+                        className={`form-control ${
+                          formErrors.password ? "is-invalid" : ""
+                        }`}
                         required
                       />
                       {formErrors.password && (
-                      <div className="invalid-feedback">{formErrors.password}</div>
+                        <div className="invalid-feedback">
+                          {formErrors.password}
+                        </div>
                       )}
                     </Col>
                   </Row>
@@ -500,11 +550,15 @@ const GeneralSetting = () => {
                         id="confirmpassword"
                         value={formData.confirmpassword}
                         onChange={handleChange}
-                        className={`form-control ${formErrors.confirmpassword ? 'is-invalid' : ''}`}
+                        className={`form-control ${
+                          formErrors.confirmpassword ? "is-invalid" : ""
+                        }`}
                         required
                       />
                       {formErrors.confirmpassword && (
-                      <div className="invalid-feedback">{formErrors.confirmpassword}</div>
+                        <div className="invalid-feedback">
+                          {formErrors.confirmpassword}
+                        </div>
                       )}
                     </Col>
                     <Col md={{ offset: 4, span: 8 }} xs={12} className="mt-4">
@@ -525,7 +579,7 @@ const GeneralSetting = () => {
             </Col>
           </Row>
           <Col
-            md={{ offset: 3, span:9 }}
+            md={{ offset: 3, span: 9 }}
             xs={12}
             className="mt-4 submit-button-container d-flex justify-content-between  "
           >
