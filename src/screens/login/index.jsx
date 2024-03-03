@@ -3,19 +3,24 @@ import AuthContext from "../../context/AuthProvider";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link , useLocation} from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import axios from "../../utils/axios";
+import useAuth from "../../context/useAuth";
 
 const LOGIN_URL = "/auth";
 
 const Login = () => {
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
+const location = useLocation();
+const from = location.state?.from?.pathname || "/"
+
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const navigate = useNavigate();
   const userRef = useRef();
   const errRef = useRef();
 
@@ -64,10 +69,11 @@ const Login = () => {
       // const accessToken = response?.data?.accessToken;
       setUsername("");
       setPassword("");
-      setSuccess(true);
+    
       setAuth({ username, password });
 
-      navigate("/dash");
+      navigate(from,{replace:true});
+      
     } catch (err) {
       if (!err.response) {
         setError("No Server Response");

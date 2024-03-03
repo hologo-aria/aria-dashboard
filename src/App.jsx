@@ -13,7 +13,8 @@ import Devices from "./screens/device";
 import AdminRegistration from "./components/admin/AdminRegistration";
 import Admin from "./screens/admin";
 import Login from "./screens/login";
-import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import RequireAuth from "./components/auth/RequireAuth";
+import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
@@ -28,22 +29,25 @@ function App() {
         <CssBaseline />
         <div className="app">
           {showSidebarAndTopbar && <Sidebar isSidebar={isSidebar} />}
-          
-            <main className="content">
-            {showSidebarAndTopbar &&  <Topbar setIsSidebar={setIsSidebar} />  }
-              <Routes>
-                <Route path="/" element={<Login />} />
+
+          <main className="content">
+            {showSidebarAndTopbar && <Topbar setIsSidebar={setIsSidebar} />}
+            <Routes>
+              <Route path="/" element={<Login />} />
+
+              {/* {Protected Routes} */}
+              <Route element={<RequireAuth />}>
                 <Route path="/dash" element={<Dashboard />} />
                 <Route path="/team" element={<Team />} />
                 <Route path="/contacts" element={<Contacts />} />
-                <Route path="/team/client" element={<ClientRegistration/>}/>
-                <Route path="/admin" element={<Admin/>} />
-                <Route path="/admin/reg" element={<AdminRegistration/>} />
-                <Route path="/cluster" element={<Cluster/>} />
-                <Route path="/devices" element={<Devices/> } />
-              </Routes>
-            </main>
-        
+                <Route path="/team/client" element={<ClientRegistration />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/reg" element={<AdminRegistration />} />
+                <Route path="/cluster" element={<Cluster />} />
+                <Route path="/devices" element={<Devices />} />
+              </Route>
+            </Routes>
+          </main>
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
