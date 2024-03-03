@@ -1,4 +1,4 @@
-import React, { useState , useEffect ,useRef , useContext } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import AuthContext from "../../context/AuthProvider";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -7,51 +7,81 @@ import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import axios from "../../utils/axios";
 
-const LOGIN_URL ='/auth';
+const LOGIN_URL = "/auth";
 
 const Login = () => {
-  const {setAuth} = useContext(AuthContext);
+  const { setAuth } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [success,setSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-
   const userRef = useRef();
   const errRef = useRef();
 
-useEffect (() => {
-  setError('');
-},[username,password])
+  useEffect(() => {
+    setError("");
+  }, [username, password]);
 
-useEffect (() => {
-  userRef.current.focus()
-},[])
-
-
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      const  response = await axios.post(LOGIN_URL,JSON.stringify({username,password}),{
-        headers: {'Content-Type':'application/json'} ,
-        withCredentials: true
-      });
-      console.log(JSON.stringify(response?.data))
+    try {
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({ username, password }),
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      console.log(JSON.stringify(response?.data.payload));
+      console.log(JSON.stringify(response?.data?.payload.user.id));
+      localStorage.setItem(
+        "username",
+        JSON.stringify(response?.data?.payload.user.username)
+      );
+      localStorage.setItem(
+        "userID",
+        JSON.stringify(response?.data?.payload.user.id)
+      );
+      localStorage.setItem(
+        "organization",
+        JSON.stringify(response?.data?.payload.user.organization)
+      );
+      localStorage.setItem(
+        "accessLevel",
+        JSON.stringify(response?.data?.payload.user.accessLevel)
+      );
+      localStorage.setItem(
+        "userType",
+        JSON.stringify(response?.data?.payload.user.userType)
+      );
       // console.log(JSON.stringify(response))
       // const accessToken = response?.data?.accessToken;
-      setUsername('')
-      setPassword('')
-      setSuccess(true)
-      navigate("/dash")
-      
-    }
-    catch{
+      setUsername("");
+      setPassword("");
+      setSuccess(true);
+      setAuth({ username, password });
 
-    }
+      navigate("/dash");
+    } catch (err) {
+      if (!err.response) {
+        setError("No Server Response");
+      } else if (err.response?.status == 400) {
+        setError("Missing Username or Password");
+      } else if (err.response?.status == 401) {
+        setError("Unautorized");
+      } else {
+        setError("Login Failed");
+      }
 
+      errRef.current.focus();
     }
-  
+  };
 
   return (
     <Box
