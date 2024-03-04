@@ -13,6 +13,10 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   const [organization, setOrganization] = useState([]);
   const [selectedOrg, setSelectedOrg] = useState("");
   const [clusterBool , setClusterBool] = useState(false) // New state for selected organization
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID")
+  const userOrganization = localStorage.getItem("organization")
+
 
   const initialFormData = {
     devicename: "",
@@ -21,8 +25,8 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     mac_address: "",
     activeStatus: false,
     location: "",
-    deivce_owner_Type: ownerType,
-    deivce_owner_id: ownerID,
+    deivce_owner_Type: userType,
+    deivce_owner_id: userID,
   };
 
   const [deviceData, setDeviceData] = useState(initialFormData);
@@ -40,10 +44,18 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   };
 
   async function getDevicesCluster() {
-    axios.get(`http://localhost:5001/api/v1/getorg`).then((res) => {
-      setOrganization(res.data);
-      console.log(organization);
-    });
+    let orgData;
+    if (userType === "Client") {
+      // If userType is "Client", set the selectedOrg to userOrganization
+      setSelectedOrg(userOrganization);
+      orgData = [{ organization: userOrganization }];
+    } else {
+      // If userType is not "Client", fetch organization data from the API
+      const response = await axios.get("http://localhost:5001/api/v1/getorg");
+      orgData = response.data;
+    }
+  
+    setOrganization(orgData);
   }
 
 
@@ -90,6 +102,22 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+
+  useEffect(() => {
+    if (selectedOrg !== "") {
+      axios
+        .get(`http://localhost:5001/api/v1/getcluster/owner/${selectedOrg}`)
+        .then((res) => {
+          setClusterName(res.data);
+          setClusterBool(true);
+        })
+        .catch((error) => {
+          console.error("Error fetching clusters:", error);
+        });
+    }
+  }, [selectedOrg]);
+
 
   const handleCreateCluster = async () => {
     console.log(deviceData);
@@ -166,6 +194,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
                   onChange={handleInputChange}
                 >
                   <option value="">Select Cluster</option>
+                  
                   {clusterName.map((cluster, index) => (
                     <option key={index} value={cluster.clustername}>
                       {cluster.clustername}

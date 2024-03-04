@@ -9,6 +9,7 @@ import SmartphoneIcon from "@mui/icons-material/Smartphone";
 import GridViewIcon from "@mui/icons-material/GridView";
 import axios from "axios";
 import Header from "../../components/Header";
+import { useUser } from "../../context/GlobalProvider";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,6 +22,13 @@ const Dashboard = () => {
   const [clusterCount , setClusterCount] = useState(0);
   const [activeDevices , setActiveDevices ] = useState(0);
   const [activeCluster , setActiveClusters ] = useState(0);
+
+  const {userData} = useUser() ;
+  console.log(userData.id)
+
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID")
+  const userOrganization = localStorage.getItem("organization")
 
   async function getDevicesCluster() {
     axios.all([
@@ -45,15 +53,52 @@ const Dashboard = () => {
     }))
   }
 
+
+
+  async function getSpecificOrgDevicesClusters() {
+
+    
+    axios.all([
+      axios.get(`http://localhost:5001/api/v1/getcluster/dash/${userOrganization}`),
+      axios.get(`http://localhost:5001/api/v1/getdevice/dash/${userOrganization}`)
+    ])
+    .then(axios.spread((clusterRes, devicesRes) => {
+
+      setClusterData(clusterRes.data);
+      console.log(clusterData);
+
+      setDeviceData(devicesRes.data);
+      console.log(deviceData);
+      setDeviceCount(devicesRes.data.length);
+      setClusterCount(clusterRes.data.length);
+      setActiveDevices(devicesRes.data.filter(device => device.activeStatus).length);
+      setActiveClusters(clusterRes.data.filter(cluster => cluster.activeStatus).length);
+
+    }))
+    .catch(error => {
+      
+      console.error("Error:", error);
+    });
+  }
+
+
+  
+
   useEffect(() => {
-    getDevicesCluster();
+   
+    if (userType != "Admin"){
+      getSpecificOrgDevicesClusters()
+    }
+    else {
+      getDevicesCluster();
+    }
   }, []);
 
 
   const handleInputChange = (e) => {
     setSelectOrg(e.target.value); 
     
-    if(selectOrg != "all") {
+    if(e.target.value != "all") {
       axios.all([
         axios.get(`http://localhost:5001/api/v1/getcluster/dash/${e.target.value}`),
         axios.get(`http://localhost:5001/api/v1/getdevice/dash/${e.target.value}`)
@@ -91,39 +136,25 @@ const Dashboard = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Dashboard" />
 
-        <Box>
-          {/* <Button
-            sx={{
-              backgroundColor: colors.blueAccent[700],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-            }}
-          >
-            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-            Download Reports
-          </Button> */}
+    
+      </Box>
+      {userType === "Client" ? null : (
+        <Box className="card-container">
+          <div style={{ width: "18rem" }}>
+            <Form.Group className="mb-3" controlId="clientname">
+              <Form.Label>Select Client</Form.Label>
+              <Form.Select name="clientname" value={selectOrg} onChange={handleInputChange}>
+                <option value="all">All</option>
+                {organization.map((org, index) => (
+                  <option key={index} value={org.organization}>
+                    {org.organization}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </div>
         </Box>
-      </Box>
-      <Box className="card-container" >
-        <div style={{width:"18rem"}}>
-          <Form.Group className="mb-3" controlId="clientname">
-            <Form.Label>Select Client</Form.Label>
-            <Form.Select
-              name="clientname"
-              value={selectOrg} onChange={handleInputChange}
-            >
-              <option value="all">All</option>
-              {organization.map((org, index) => (
-                      <option key={index} value={org.organization}>
-                        {org.organization}
-                      </option>
-                    ))}
-            </Form.Select>
-          </Form.Group>
-        </div>
-      </Box>
+      )}
       <Box className="card-container">
         <Card style={{ width: "18rem" }}>
           <Card.Header className="card-header">

@@ -10,6 +10,9 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
   const [ownerID, setOwnerID] = useState("cli002");
   const [ownerType, setOwnerType] = useState("");
   const [organization, setOrganization] = useState([]);
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID")
+  const userOrganization = localStorage.getItem("organization")
 
   const initialFormData = {
     clusterID: "clu001",
@@ -17,8 +20,8 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     organization: "",
     location: "",
     activeStatus: false,
-    cluster_owner_Type: ownerType,
-    cluster_owner_id: ownerID,
+    cluster_owner_Type: userType,
+    cluster_owner_id: userID,
   };
 
   const [clusterData, setClusterData] = useState(initialFormData);
@@ -37,10 +40,18 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
 
 
   async function getDevicesCluster() {
-    axios.get(`http://localhost:5001/api/v1/getorg`).then((res) => {
-      setOrganization(res.data);
-      console.log(organization);
-    });
+    let orgData;
+    if (userType === "Client") {
+      // If userType is "Client", set the selectedOrg to userOrganization
+    
+      orgData = [{ organization: userOrganization }];
+    } else {
+      // If userType is not "Client", fetch organization data from the API
+      const response = await axios.get("http://localhost:5001/api/v1/getorg");
+      orgData = response.data;
+    }
+  
+    setOrganization(orgData);
   }
 
 

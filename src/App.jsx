@@ -22,6 +22,8 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
   const showSidebarAndTopbar = location.pathname !== "/"; // Check if it's not the login page
+ 
+  
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -36,7 +38,7 @@ function App() {
               <Route path="/" element={<Login />} />
 
               {/* {Protected Routes} */}
-              <Route element={<RequireAuth />}>
+              {/* <Route element={<RequireAuth allowedRoles={["Admin", "Client"]}  />}> */}
                 <Route path="/dash" element={<Dashboard />} />
                 <Route path="/team" element={<Team />} />
                 <Route path="/contacts" element={<Contacts />} />
@@ -45,7 +47,7 @@ function App() {
                 <Route path="/admin/reg" element={<AdminRegistration />} />
                 <Route path="/cluster" element={<Cluster />} />
                 <Route path="/devices" element={<Devices />} />
-              </Route>
+              {/* </Route> */}
             </Routes>
           </main>
         </div>

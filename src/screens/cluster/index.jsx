@@ -19,6 +19,12 @@ function Cluster() {
     const [clusterID,setClusterID] = useState();
     const [showClusterModal, setShowClusterModal] = useState(false);
 
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID")
+  const userOrganization = localStorage.getItem("organization")
+
+
+
     const handleShowModal = () => {
      
       setShowModal(true);
@@ -38,21 +44,41 @@ function Cluster() {
       setShowClusterModal(false);
     };
 
-    useEffect(() => {
-      
-      const fetchClusters = async () => {
-        try {
-          const response = await axios.get(
-            "http://localhost:5001/api/v1/getcluster"
-          );
-          setCluster(response.data);
-        } catch (error) {
-          console.error("Error fetching clusters:", error);
-        }
-      };
+    const fetchClusters = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5001/api/v1/getcluster"
+        );
+        setCluster(response.data);
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
   
-      fetchClusters();
-    }, [showModal,showClusterModal]);
+  
+    const fetchClientClusters = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/v1/getcluster/dash/${userOrganization}`)
+  
+        setCluster(response.data);
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
+  
+  
+    useEffect(() => {
+     
+      if(userType != "Admin")
+      {
+        fetchClientClusters()
+      }
+      else {
+  
+        fetchClusters();
+      }
+  
+    }, [showModal, showClusterModal]);
 
     const alertMsg = (e) =>{
       Swal.fire({

@@ -1,91 +1,69 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import AuthContext from "../../context/AuthProvider";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import { useNavigate , Link , useLocation} from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import axios from "../../utils/axios";
+import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../context/useAuth";
+import { useUser } from "../../context/GlobalProvider";
 
 const LOGIN_URL = "/auth";
 
 const Login = () => {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
-const location = useLocation();
-const from = location.state?.from?.pathname || "/"
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const { updateUser } = useUser();
 
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+
   const userRef = useRef();
-  const errRef = useRef();
 
   useEffect(() => {
     setError("");
-  }, [username, password]);
+  }, [formData.username, formData.password]);
 
   useEffect(() => {
     userRef.current.focus();
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        LOGIN_URL,
-        JSON.stringify({ username, password }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      console.log(JSON.stringify(response?.data.payload));
-      console.log(JSON.stringify(response?.data?.payload.user.id));
-      localStorage.setItem(
-        "username",
-        JSON.stringify(response?.data?.payload.user.username)
-      );
-      localStorage.setItem(
-        "userID",
-        JSON.stringify(response?.data?.payload.user.id)
-      );
-      localStorage.setItem(
-        "organization",
-        JSON.stringify(response?.data?.payload.user.organization)
-      );
-      localStorage.setItem(
-        "accessLevel",
-        JSON.stringify(response?.data?.payload.user.accessLevel)
-      );
-      localStorage.setItem(
-        "userType",
-        JSON.stringify(response?.data?.payload.user.userType)
-      );
-      // console.log(JSON.stringify(response))
-      // const accessToken = response?.data?.accessToken;
-      setUsername("");
-      setPassword("");
-    
-      setAuth({ username, password });
+      const response = await axios.post(LOGIN_URL, formData, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
 
-      navigate(from,{replace:true});
-      
+     
+
+      const { user, token } = response.data.payload;
+      updateUser(user);
+      localStorage.setItem("userType" , user.userType )
+      localStorage.setItem("userID" , user.id )
+      localStorage.setItem("organization" , user.organization )
+      setAuth({ ...formData, accessToken: token, userRole: user.userType });
+
+
+      navigate("/dash", { replace: true });
     } catch (err) {
       if (!err.response) {
         setError("No Server Response");
-      } else if (err.response?.status == 400) {
+      } else if (err.response.status === 400) {
         setError("Missing Username or Password");
-      } else if (err.response?.status == 401) {
-        setError("Unautorized");
+      } else if (err.response.status === 401) {
+        setError("Unauthorized");
       } else {
         setError("Login Failed");
       }
-
-      errRef.current.focus();
     }
   };
 
@@ -118,8 +96,9 @@ const from = location.state?.from?.pathname || "/"
           <TextField
             label="Username"
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
             variant="outlined"
             margin="normal"
             autoComplete="off"
@@ -129,8 +108,9 @@ const from = location.state?.from?.pathname || "/"
           <TextField
             label="Password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             variant="outlined"
             margin="normal"
             required
