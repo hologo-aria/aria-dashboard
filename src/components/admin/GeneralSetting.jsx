@@ -21,8 +21,10 @@ const GeneralSetting = () => {
 
 
   const [cliID, setCliID] = useState("cli001");
-  const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
-  const validationSchema = Yup.object().shape({
+  
+  const alphanumericRegex = /^[a-zA-Z0-9\s.,#\/-]+$/;
+
+  const generalInfoSchema = Yup.object().shape({
     firstname: Yup.string().required("First name is required"),
     lastname: Yup.string().required("Last name is required"),
     organization: Yup.string().required("Organization name is required"),
@@ -47,6 +49,10 @@ const GeneralSetting = () => {
       .matches(alphanumericRegex, "Invalid address"),
     timeZone: Yup.string(),
     zipcode: Yup.number().required("Zip code is required"),
+    
+  });
+  
+  const loginCredentialsSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),
     password: Yup.string()
       .required("Password is required")
@@ -60,7 +66,6 @@ const GeneralSetting = () => {
       .oneOf([Yup.ref("password"), null], "Passwords must match"),
     accessLevel: Yup.string().required("Access level is required"),
   });
-  
   
   useEffect(() => {
     var date = new Date();
@@ -139,25 +144,24 @@ const GeneralSetting = () => {
   ];
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
-  };
+  const { id, value } = e.target;
 
-  const handleSubmit = async (e) => {
+  setFormErrors((prevErrors) => ({
+    ...prevErrors,
+    [id]: undefined,
+  }));
+
+  setFormData((prevData) => ({
+    ...prevData,
+    [id]: value,
+  }));
+};
+
+  const handleNextClick = async (e) => {
     e.preventDefault();
     try {
-      await validationSchema.validate(formData, { abortEarly: false });
-      // If validation is successful, proceed with form submission
-      const response = await axios.post(
-        "http://localhost:5001/api/v1/admin",
-        formData
-      );
-      console.log("Admin created:", response.data);
-      setFormData(initialFormData);
-      navigate("/admin");
+      await generalInfoSchema.validate(formData, { abortEarly: false });
+      setShowGeneralForm(false);
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         // Handle Yup validation errors
@@ -171,6 +175,42 @@ const GeneralSetting = () => {
       } else {
         console.error("Error creating Admin:", error);
       }
+    }
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await loginCredentialsSchema.validate(formData, { abortEarly: false });
+      await handleSubmit(e);
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        // Handle Yup validation errors
+        const errors = {};
+        error.inner.forEach((err) => {
+          errors[err.path] = err.message;
+        });
+        console.error("Validation errors:", errors);
+        // Set the errors to the state
+        setFormErrors(errors);
+      } else {
+        console.error("Error creating Admin:", error);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  try {
+    const response = await axios.post(
+      "http://localhost:5001/api/v1/admin",
+      formData
+    );
+    console.log("Admin created:", response.data);
+    setFormData(initialFormData);
+    navigate("/admin");
+  } catch (error) {
+    console.error("Error creating Admin:", error);
     }
   };
   
@@ -413,7 +453,7 @@ const GeneralSetting = () => {
           >
             <button
               className="back-next-button"
-              onClick={() => setShowGeneralForm(false)}
+              onClick={handleNextClick}
             >
               Next
             </button>
@@ -535,7 +575,7 @@ const GeneralSetting = () => {
             >
               Back
             </button>
-            <button className="submit-button" type="submit">
+            <button className="submit-button" type="submit" onClick={handleLoginSubmit}>
               Submit
             </button>
           </Col>

@@ -19,8 +19,10 @@ const GeneralSetting = () => {
 
 
   const [cliID, setCliID] = useState("cli001");
-  const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
-  const validationSchema = Yup.object().shape({
+
+  const alphanumericRegex = /^[a-zA-Z0-9\s.,#\/-]+$/;
+
+  const generalInfoSchema = Yup.object().shape({
     firstname: Yup.string().required("First name is required"),
     lastname: Yup.string().required("Last name is required"),
     organization: Yup.string().required("Organization name is required"),
@@ -45,6 +47,10 @@ const GeneralSetting = () => {
       .matches(alphanumericRegex, "Invalid address"),
     timeZone: Yup.string(),
     zipcode: Yup.number().required("Zip code is required"),
+    
+  });
+  
+  const loginCredentialsSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),
     password: Yup.string()
       .required("Password is required")
@@ -123,18 +129,65 @@ const GeneralSetting = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
+  
+    setFormErrors((prevErrors) => ({
+      ...prevErrors,
+      [id]: undefined,
+    }));
+  
     setFormData((prevData) => ({
       ...prevData,
       [id]: value,
     }));
   };
 
+  const handleNextClick = async (e) => {
+    e.preventDefault();
+    try {
+      await generalInfoSchema.validate(formData, { abortEarly: false });
+      setShowGeneralForm(false);
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        // Handle Yup validation errors
+        const errors = {};
+        error.inner.forEach((err) => {
+          errors[err.path] = err.message;
+        });
+        console.error("Validation errors:", errors);
+        // Set the errors to the state
+        setFormErrors(errors);
+      } else {
+        console.error("Error creating Admin:", error);
+      }
+    }
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await loginCredentialsSchema.validate(formData, { abortEarly: false });
+      await handleSubmit(e);
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        // Handle Yup validation errors
+        const errors = {};
+        error.inner.forEach((err) => {
+          errors[err.path] = err.message;
+        });
+        console.error("Validation errors:", errors);
+        // Set the errors to the state
+        setFormErrors(errors);
+      } else {
+        console.error("Error creating Admin:", error);
+      }
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
-      // Validate form data using Yup schema
-      await validationSchema.validate(formData, { abortEarly: false });
   
       // If validation passes, make the API call
       const response = await axios.post(
@@ -146,18 +199,7 @@ const GeneralSetting = () => {
       setFormData(initialFormData);
       navigate("/team");
     } catch (error) {
-      if (error.name === 'ValidationError') {
-        // Handle Yup validation errors
-        const validationErrors = {};
-        error.inner.forEach(err => {
-          validationErrors[err.path] = err.message;
-        });
-        console.error("Validation errors:", validationErrors);
-        // Update the state or display error messages accordingly
-        setFormErrors(validationErrors);
-      } else {
-        console.error("Error creating client:", error);
-      }
+      console.error("Error creating Admin:", error);
     }
   };
   
@@ -399,7 +441,7 @@ const GeneralSetting = () => {
           >
             <button
               className="back-next-button"
-              onClick={() => setShowGeneralForm(false)}
+              onClick={handleNextClick}
             >
               Next
             </button>
@@ -520,7 +562,7 @@ const GeneralSetting = () => {
             >
               Back
             </button>
-            <button className="submit-button" type="submit">
+            <button className="submit-button" type="submit" onClick={handleLoginSubmit}>
               Submit
             </button>
           </Col>
