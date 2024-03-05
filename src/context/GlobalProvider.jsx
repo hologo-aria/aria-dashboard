@@ -12,6 +12,7 @@ export const GlobalUserProvider = ({ children }) => {
 
   const logout = () => {
     setUserData(null);
+    localStorage.clear();
   }
 
   return (

@@ -50,6 +50,7 @@ const Login = () => {
       localStorage.setItem("userType" , user.userType )
       localStorage.setItem("userID" , user.id )
       localStorage.setItem("organization" , user.organization )
+      localStorage.setItem("auth",true);
       setAuth({ ...formData, accessToken: token, userRole: user.userType });
 
 
