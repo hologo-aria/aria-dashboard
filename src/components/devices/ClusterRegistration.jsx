@@ -4,16 +4,12 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
 import * as yup from 'yup';
-=======
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
 
 function ClusterRegistration({ showModal, handleCloseModal }) {
   const [show, setShow] = useState(showModal);
   const [ownerID, setOwnerID] = useState("cli002");
   const [ownerType, setOwnerType] = useState("");
-<<<<<<< HEAD
   const [validationErrors, setValidationErrors] = useState({});
 
 
@@ -23,12 +19,10 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     location: yup.string().required('Location is required'),
   });
   
-=======
   const [organization, setOrganization] = useState([]);
   const userType = localStorage.getItem("userType");
   const userID = localStorage.getItem("userID")
   const userOrganization = localStorage.getItem("organization")
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
 
   const initialFormData = {
     clusterID: "clu001",
@@ -54,8 +48,6 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     }
   };
 
-<<<<<<< HEAD
-=======
 
   async function getDevicesCluster() {
     let orgData;
@@ -74,7 +66,6 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
 
 
 
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
   useEffect(() => {
     getDevicesCluster();
     setShow(showModal);
@@ -92,11 +83,12 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
   const handleClose = () => {
     setShow(false);
     handleCloseModal();
+    setClusterData({});
+    setValidationErrors({})
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-<<<<<<< HEAD
   
     // Clear validation errors for the current input field
     setValidationErrors((prevErrors) => ({
@@ -104,8 +96,6 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
       [name]: undefined,
     }));
   
-=======
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
     setClusterData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
@@ -114,27 +104,20 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
 
   const handleCreateCluster = async () => {
     try {
-<<<<<<< HEAD
       // Validate form data
       await validationSchema.validate(clusterData, { abortEarly: false });
   
       // If validation passes, make the API call
-=======
       console.log(clusterData);
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
       const response = await axios.post(
         "http://localhost:5001/api/v1/cluster",
         clusterData
       );
-<<<<<<< HEAD
   
-=======
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
       console.log("Cluster created successfully:", response.data);
       setClusterData(initialFormData);
       handleClose();
     } catch (error) {
-<<<<<<< HEAD
       if (error.name === 'ValidationError') {
         // Yup validation error
         const errors = {};
@@ -145,9 +128,7 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
       } else {
         console.error("Error creating cluster:", error);
       }
-=======
       console.error("Error creating cluster:", error);
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
     }
   };
 
@@ -175,34 +156,21 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                   </Form.Control.Feedback>
                 </Form.Group>
               </div>
-<<<<<<< HEAD
-=======
               
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
-                  <Form.Select
-                    name="organization"
-<<<<<<< HEAD
-                    value={clusterData.organization}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.organization}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.organization}
-                  </Form.Control.Feedback>
-=======
-                    value={clusterData.organization} onChange={handleInputChange}
-                  >
-                    <option value="all">Select Organization</option>
+                <Form.Select>
+                    <option value="">Select Organization</option>
                     {organization.map((org, index) => (
                       <option key={index} value={org.organization}>
                         {org.organization}
                       </option>
                     ))}
                   </Form.Select>
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.organization}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>

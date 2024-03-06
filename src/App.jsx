@@ -12,11 +12,8 @@ import Cluster from "./screens/cluster";
 import Devices from "./screens/device";
 import AdminRegistration from "./components/admin/AdminRegistration";
 import Admin from "./screens/admin";
-<<<<<<< HEAD
-=======
 import Login from "./screens/login";
 import RequireAuth from "./components/auth/RequireAuth";
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
 
 function App() {
   const [theme, colorMode] = useMode();

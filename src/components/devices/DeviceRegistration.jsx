@@ -11,17 +11,14 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   const [ownerID, setOwnerID] = useState("cli001");
   const [ownerType, setOwnerType] = useState("");
   const [clusterName, setClusterName] = useState([]);
-<<<<<<< HEAD
   const [validationErrors, setValidationErrors] = useState({});
 
-=======
   const [organization, setOrganization] = useState([]);
   const [selectedOrg, setSelectedOrg] = useState("");
   const [clusterBool , setClusterBool] = useState(false) // New state for selected organization
   const userType = localStorage.getItem("userType");
   const userID = localStorage.getItem("userID")
   const userOrganization = localStorage.getItem("organization")
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
 
 
   const initialFormData = {
@@ -87,6 +84,8 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     setClusterBool(false);
     setShow(false);
     handleCloseModal();
+    setDeviceData({});
+    setValidationErrors({})
   };
 
   const handleOrganizationChange = (e) => {
@@ -109,7 +108,6 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     }));
   };
 
-<<<<<<< HEAD
   const validationSchema = yup.object().shape({
     devicename: yup.string().required('Device Name is required'),
     clustername: yup.string().required('Cluster Name is required'),
@@ -117,7 +115,6 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     mac_address: yup.string().required('MAC Address is required'),
     location: yup.string().required('Location is required'),
   });
-=======
 
   useEffect(() => {
     if (selectedOrg !== "") {
@@ -133,7 +130,6 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     }
   }, [selectedOrg]);
 
->>>>>>> parent of 39f2a0c (Merge pull request #3 from hologo-aria/Validation-)
 
   const handleCreateCluster = async () => {
     console.log(deviceData);
