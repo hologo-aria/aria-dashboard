@@ -10,6 +10,7 @@ import GridViewIcon from "@mui/icons-material/GridView";
 import axios from "axios";
 import Header from "../../components/Header";
 import { useUser } from "../../context/GlobalProvider";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -23,12 +24,20 @@ const Dashboard = () => {
   const [activeDevices , setActiveDevices ] = useState(0);
   const [activeCluster , setActiveClusters ] = useState(0);
 
+
+  const navigate = useNavigate();
+
   const {userData} = useUser() ;
   console.log(userData.id)
 
   const userType = localStorage.getItem("userType");
   const userID = localStorage.getItem("userID")
   const userOrganization = localStorage.getItem("organization")
+  const auth = localStorage.getItem("auth");
+
+  if (!auth){
+navigate("/") 
+ }
 
   async function getDevicesCluster() {
     axios.all([

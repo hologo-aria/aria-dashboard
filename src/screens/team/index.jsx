@@ -6,7 +6,7 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import { Edit, Delete, Add } from "@mui/icons-material";
 import Header from "../../components/Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import EditForm from "../../components/client/EditForm";
@@ -25,6 +25,13 @@ const Team = () => {
     setShowModal(true);
   };
 
+  const navigate = useNavigate()
+
+  const auth = localStorage.getItem("auth");
+
+  if (!auth){
+navigate("/") 
+ }
 
   const alertMsg = (e) =>{
     Swal.fire({

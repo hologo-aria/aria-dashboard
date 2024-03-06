@@ -4,7 +4,7 @@ import { Box, useTheme, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Edit, Delete, Add } from "@mui/icons-material";
 import DeviceRegistration from "../../components/devices/DeviceRegistration";
 import axios from "axios";
@@ -25,7 +25,13 @@ function Devices() {
   const userID = localStorage.getItem("userID")
   const userOrganization = localStorage.getItem("organization")
 
+  const navigate = useNavigate()
 
+  const auth = localStorage.getItem("auth");
+
+  if (!auth){
+navigate("/") 
+ }
 
   const handleShowModal = () => {
     setShowModal(true);

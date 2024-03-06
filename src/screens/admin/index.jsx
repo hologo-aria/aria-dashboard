@@ -11,11 +11,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import EditForm from "../../components/admin/EditForm";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  const navigate= useNavigate()
 
   const [admins, setAdmins] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -24,6 +26,12 @@ const Admin = () => {
     setadminID(e);
     setShowModal(true);
   };
+  const auth = localStorage.getItem("auth");
+
+  if (!auth){
+navigate("/") 
+ }
+
 
 
   const alertMsg = (e) =>{

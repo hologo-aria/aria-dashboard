@@ -18,6 +18,12 @@ const GeneralSetting = () => {
   const [countryData, setCountryData] = useState();
   const [formErrors, setFormErrors] = useState({});
 
+  const auth = localStorage.getItem("auth");
+
+  if (!auth){
+navigate("/") 
+ }
+
 
 
   const [cliID, setCliID] = useState("cli001");
