@@ -80,6 +80,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     setClusterName([]);
     setClusterBool(false);
     setShow(false);
+    setDeviceData({});
     handleCloseModal();
   };
 

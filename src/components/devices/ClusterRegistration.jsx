@@ -73,6 +73,7 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
   const handleClose = () => {
     setShow(false);
     handleCloseModal();
+    setClusterData({});
   };
 
   const handleInputChange = (e) => {
