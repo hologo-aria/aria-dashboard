@@ -4,14 +4,22 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
-import * as yup from 'yup';
 
 function DeviceRegistration({ showModal, handleCloseModal }) {
   const [show, setShow] = useState(showModal);
   const [ownerID, setOwnerID] = useState("cli001");
   const [ownerType, setOwnerType] = useState("");
   const [clusterName, setClusterName] = useState([]);
+
   const [validationErrors, setValidationErrors] = useState({});
+
+
+  const [organization, setOrganization] = useState([]);
+  const [selectedOrg, setSelectedOrg] = useState("");
+  const [clusterBool , setClusterBool] = useState(false) // New state for selected organization
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID")
+  const userOrganization = localStorage.getItem("organization")
 
 
 
@@ -81,6 +89,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
 
   const handleClose = () => {
     setShow(false);
+    setDeviceData({});
     handleCloseModal();
   };
 
@@ -92,6 +101,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     }));
   };
 
+
   const validationSchema = yup.object().shape({
     devicename: yup.string().required('Device Name is required'),
     clustername: yup.string().required('Cluster Name is required'),
@@ -100,26 +110,36 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     location: yup.string().required('Location is required'),
   });
 
+
+  useEffect(() => {
+    if (selectedOrg !== "") {
+      axios
+        .get(`http://localhost:5001/api/v1/getcluster/owner/${selectedOrg}`)
+        .then((res) => {
+          setClusterName(res.data);
+          setClusterBool(true);
+        })
+        .catch((error) => {
+          console.error("Error fetching clusters:", error);
+        });
+    }
+  }, [selectedOrg]);
+
+
+
   const handleCreateCluster = async () => {
     console.log(deviceData);
     try {
-      await validationSchema.validate(deviceData, { abortEarly: false });
-
-      const response = await axios.post("http://localhost:5001/api/v1/device", deviceData);
+      console.log(deviceData);
+      const response = await axios.post(
+        "http://localhost:5001/api/v1/device",
+        deviceData
+      );
       console.log("Device created successfully:", response.data);
-
       setDeviceData(initialFormData);
       handleClose();
     } catch (error) {
-      if (error.name === 'ValidationError') {
-        const errors = {};
-        error.inner.forEach((e) => {
-          errors[e.path] = e.message;
-        });
-        setValidationErrors(errors);
-      } else {
-        console.error("Error creating Device:", error);
-      }
+      console.error("Error creating Device:", error);
     }
   };
 
@@ -140,11 +160,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
                     name="devicename"
                     value={deviceData.devicename}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.devicename}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.devicename}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
@@ -155,11 +171,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
                     name="mac_address"
                     value={deviceData.mac_address}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.mac_address}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.mac_address}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -175,9 +187,6 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
                       </option>
                     ))}
                   </Form.Select>
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.clustername}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
@@ -205,11 +214,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
                     name="location"
                     value={deviceData.location}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.location}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.location}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>

@@ -4,12 +4,10 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
-import * as yup from 'yup';
 
 function EditCluster({ showModal, handleCloseModal, clusterID }) {
   const [show, setShow] = useState(showModal);
   const [clusterData, setClusterData] = useState([{}]); // State to store cluster data
-  const [validationErrors, setValidationErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,7 +33,6 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
   const handleClose = () => {
     setShow(false);
     handleCloseModal();
-    setValidationErrors({}); // Reset validation errors
   };
 
   const handleInputChange = (e) => {
@@ -46,36 +43,14 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
     });
   };
 
-  const validationSchema = yup.object().shape({
-    clustername: yup.string().required('Cluster Name is required'),
-    organization: yup.string().required('Organization is required'),
-    location: yup.string().required('Location is required'),
-    cluster_owner_id: yup.string().required('Owner ID is required'),
-  });
-
   const handleSubmit = async () => {
-    try {
-      await validationSchema.validate(clusterData, { abortEarly: false });
-
-      const response = await axios.put(
-        `http://localhost:5001/api/v1/getcluster/${clusterID}`,
-        clusterData
-      );
-      
-      handleClose();
-      console.log("Changes saved successfully:", response.data);
-      navigate("/cluster");
-    } catch (error) {
-      if (error.name === 'ValidationError') {
-        const errors = {};
-        error.inner.forEach((e) => {
-          errors[e.path] = e.message;
-        });
-        setValidationErrors(errors);
-      } else {
-        console.error("Error saving changes:", error);
-      }
-    }
+    axios
+      .put(`http://localhost:5001/api/v1/getcluster/${clusterID}`, clusterData)
+      .then((res) => {
+        handleClose();
+        console.log("Done and dusted");
+        navigate("/cluster");
+      });
   };
 
   if (!clusterData) {
@@ -99,7 +74,6 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
                     name="clusterID"
                     value={clusterData.clusterID}
                     onChange={handleInputChange}
-                    readOnly
                   />
                 </Form.Group>
               </div>
@@ -111,11 +85,7 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
                     name="clustername"
                     value={clusterData.clustername}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.clustername}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.clustername}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -128,11 +98,7 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
                     name="organization"
                     value={clusterData.organization}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.organization}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.organization}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
@@ -143,11 +109,7 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
                     name="location"
                     value={clusterData.location}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.location}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.location}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -160,11 +122,7 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
                     name="cluster_owner_id"
                     value={clusterData.cluster_owner_id}
                     onChange={handleInputChange}
-                    isInvalid={!!validationErrors.cluster_owner_id}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.cluster_owner_id}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>

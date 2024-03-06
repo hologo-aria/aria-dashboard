@@ -6,64 +6,16 @@ import { useNavigate } from "react-router-dom";
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
-import * as Yup from 'yup';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 import "./../../assets/css/generalSetting.css";
 
 const GeneralSetting = () => {
   const [showGeneralForm, setShowGeneralForm] = useState(true);
   const [adminId, setAdminId] = useState("adm001");
-  const [formErrors, setFormErrors] = useState({});
 
 
 
   const [cliID, setCliID] = useState("cli001");
-
-  const alphanumericRegex = /^[a-zA-Z0-9\s.,#\/-]+$/;
-
-  const generalInfoSchema = Yup.object().shape({
-    firstname: Yup.string().required("First name is required"),
-    lastname: Yup.string().required("Last name is required"),
-    organization: Yup.string().required("Organization name is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    mobile: Yup.string()
-    .nullable()
-    .test('is-valid-number', 'Invalid mobile number', function (value, context) {
-      const { country } = context.parent;
-      if (country && value) {
-        const phoneNumber = parsePhoneNumberFromString(value, country);
-        return phoneNumber ? phoneNumber.isValid() : false;
-      }
-      return true; // Allow null or undefined values
-    })
-    .required('Mobile number is required'),
-    country: Yup.string().required('Country is required'),
-    addressLine: Yup.string()
-      .required("Address line 1 is required")
-      .matches(alphanumericRegex, "Invalid address"),
-    addressLineTwo: Yup.string()
-      .required("Address line 2 is required")
-      .matches(alphanumericRegex, "Invalid address"),
-    timeZone: Yup.string(),
-    zipcode: Yup.number().required("Zip code is required"),
-    
-  });
-  
-  const loginCredentialsSchema = Yup.object().shape({
-    username: Yup.string().required("Username is required"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]+$/,
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-      ),
-    confirmpassword: Yup.string()
-      .required("Confirm password is required")
-      .oneOf([Yup.ref("password"), null], "Passwords must match"),
-    accessLevel: Yup.string().required("Access level is required"),
-  });
 
   useEffect(() => {
     var date = new Date();
@@ -129,80 +81,26 @@ const GeneralSetting = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-  
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [id]: undefined,
-    }));
-  
     setFormData((prevData) => ({
       ...prevData,
       [id]: value,
     }));
   };
 
-  const handleNextClick = async (e) => {
-    e.preventDefault();
-    try {
-      await generalInfoSchema.validate(formData, { abortEarly: false });
-      setShowGeneralForm(false);
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        // Handle Yup validation errors
-        const errors = {};
-        error.inner.forEach((err) => {
-          errors[err.path] = err.message;
-        });
-        console.error("Validation errors:", errors);
-        // Set the errors to the state
-        setFormErrors(errors);
-      } else {
-        console.error("Error creating Admin:", error);
-      }
-    }
-  };
-
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await loginCredentialsSchema.validate(formData, { abortEarly: false });
-      await handleSubmit(e);
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        // Handle Yup validation errors
-        const errors = {};
-        error.inner.forEach((err) => {
-          errors[err.path] = err.message;
-        });
-        console.error("Validation errors:", errors);
-        // Set the errors to the state
-        setFormErrors(errors);
-      } else {
-        console.error("Error creating Admin:", error);
-      }
-    }
-  };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
-  
-      // If validation passes, make the API call
       const response = await axios.post(
         "http://localhost:5001/api/v1/client",
         formData
       );
-  
       console.log("Client created:", response.data);
       setFormData(initialFormData);
       navigate("/team");
     } catch (error) {
-      console.error("Error creating Admin:", error);
+      console.error("Error creating client:", error);
     }
   };
-  
 
   return (
     <div className="form-container">
@@ -235,30 +133,24 @@ const GeneralSetting = () => {
                       <div className="col-sm-4 mb-3 mb-lg-0">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.firstname ? 'is-invalid' : ''}`}
+                          className="form-control"
                           placeholder="First name"
                           id="firstname"
                           value={formData.firstname}
                           onChange={handleChange}
                           required
                         />
-                        {formErrors.firstname && (
-                        <div className="invalid-feedback">{formErrors.firstname}</div>
-                        )}
                       </div>
                       <div className="col-sm-4">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.lastname ? 'is-invalid' : ''}`}
+                          className="form-control"
                           placeholder="Last name"
                           id="lastname"
                           value={formData.lastname}
                           onChange={handleChange}
                           required
                         />
-                        {formErrors.lastname && (
-                        <div className="invalid-feedback">{formErrors.lastname}</div>
-                        )}
                       </div>
                     </Row>
 
@@ -272,16 +164,13 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.organization ? 'is-invalid' : ''}`}
+                          className="form-control"
                           placeholder="Organization name"
                           id="organization"
                           value={formData.organization}
                           onChange={handleChange}
                           required
                         />
-                        {formErrors.organization && (
-                        <div className="invalid-feedback">{formErrors.organization}</div>
-                        )}
                       </div>
                     </Row>
 
@@ -295,16 +184,13 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="email"
-                          className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
+                          className="form-control"
                           placeholder="Email"
                           id="email"
                           value={formData.email}
                           onChange={handleChange}
                           required
                         />
-                        {formErrors.email && (
-                        <div className="invalid-feedback">{formErrors.email}</div>
-                        )}
                       </div>
                     </Row>
 
@@ -318,15 +204,12 @@ const GeneralSetting = () => {
                       <div className="col-sm-8">
                         <input
                           type="text"
-                          className={`form-control ${formErrors.mobile ? 'is-invalid' : ''}`}
+                          className="form-control"
                           placeholder="mobile"
                           id="mobile"
                           value={formData.mobile}
                           onChange={handleChange}
                         />
-                        {formErrors.mobile && (
-                        <div className="invalid-feedback">{formErrors.mobile}</div>
-                        )}
                       </div>
                     </Row>
 
@@ -342,11 +225,7 @@ const GeneralSetting = () => {
                           options={countryOptions}
                           value={formData.country}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.country ? 'is-invalid' : ''}`}
                         />
-                        {formErrors.country && (
-                        <div className="invalid-feedback">{formErrors.country}</div>
-                        )}
                       </Col>
                     </Row>
 
@@ -361,12 +240,8 @@ const GeneralSetting = () => {
                           id="addressLine"
                           value={formData.addressLine}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.addressLine ? 'is-invalid' : ''}`}
                           required
                         />
-                        {formErrors.addressLine && (
-                        <div className="invalid-feedback">{formErrors.addressLine}</div>
-                        )}
                       </Col>
                     </Row>
 
@@ -381,12 +256,8 @@ const GeneralSetting = () => {
                           id="addressLineTwo"
                           value={formData.addressLineTwo}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.addressLineTwo ? 'is-invalid' : ''}`}
                           required
                         />
-                        {formErrors.addressLineTwo && (
-                        <div className="invalid-feedback">{formErrors.addressLineTwo}</div>
-                        )}
                       </Col>
                     </Row>
 
@@ -402,10 +273,7 @@ const GeneralSetting = () => {
                           options={timeZoneOptions}
                           value={formData.timeZone}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.timeZone ? 'is-invalid' : ''}`}
                         />
-                        {formErrors.timeZone && (<div className="invalid-feedback">{formErrors.timeZone}</div>
-                        )}
                       </Col>
                     </Row>
 
@@ -420,12 +288,8 @@ const GeneralSetting = () => {
                           id="zipcode"
                           value={formData.zipcode}
                           onChange={handleChange}
-                          className={`form-control ${formErrors.zipcode ? 'is-invalid' : ''}`}
                           required
                         />
-                        {formErrors.zipcode && (
-                        <div className="invalid-feedback">{formErrors.zipcode}</div>
-                        )}
                       </Col>
                     </Row>
                   </div>
@@ -441,7 +305,7 @@ const GeneralSetting = () => {
           >
             <button
               className="back-next-button"
-              onClick={handleNextClick}
+              onClick={() => setShowGeneralForm(false)}
             >
               Next
             </button>
@@ -487,12 +351,8 @@ const GeneralSetting = () => {
                         id="username"
                         value={formData.username}
                         onChange={handleChange}
-                        className={`form-control ${formErrors.username ? 'is-invalid' : ''}`}
                         required
                       />
-                      {formErrors.username && (
-                      <div className="invalid-feedback">{formErrors.username}</div>
-                      )}
                     </Col>
                   </Row>
 
@@ -507,12 +367,8 @@ const GeneralSetting = () => {
                         id="password"
                         value={formData.password}
                         onChange={handleChange}
-                        className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
                         required
                       />
-                      {formErrors.password && (
-                      <div className="invalid-feedback">{formErrors.password}</div>
-                      )}
                     </Col>
                   </Row>
 
@@ -527,12 +383,8 @@ const GeneralSetting = () => {
                         id="confirmpassword"
                         value={formData.confirmpassword}
                         onChange={handleChange}
-                        className={`form-control ${formErrors.confirmpassword ? 'is-invalid' : ''}`}
                         required
                       />
-                      {formErrors.confirmpassword && (
-                      <div className="invalid-feedback">{formErrors.confirmpassword}</div>
-                      )}
                     </Col>
                     <Col md={{ offset: 4, span: 8 }} xs={12} className="mt-4">
                       <h6 className="mb-1">Password requirements:</h6>
@@ -562,7 +414,7 @@ const GeneralSetting = () => {
             >
               Back
             </button>
-            <button className="submit-button" type="submit" onClick={handleLoginSubmit}>
+            <button className="submit-button" type="submit">
               Submit
             </button>
           </Col>
