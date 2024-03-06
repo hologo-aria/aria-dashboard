@@ -6,7 +6,6 @@ import Topbar from "./screens/global/Topbar";
 import Sidebar from "./screens/global/Sidebar";
 import Dashboard from "./screens/dashboard";
 import Team from "./screens/team";
-import Contacts from "./screens/contacts";
 import ClientRegistration from "./components/client/ClientRegistration";
 import Cluster from "./screens/cluster";
 import Devices from "./screens/device";
@@ -34,18 +33,13 @@ function App() {
             {showSidebarAndTopbar && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
               <Route path="/" element={<Login />} />
-
-              {/* {Protected Routes} */}
-              {/* <Route element={<RequireAuth allowedRoles={["Admin", "Client"]}  />}> */}
                 <Route path="/dash" element={<Dashboard />} />
                 <Route path="/team" element={<Team />} />
-                <Route path="/contacts" element={<Contacts />} />
                 <Route path="/team/client" element={<ClientRegistration />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/reg" element={<AdminRegistration />} />
                 <Route path="/cluster" element={<Cluster />} />
                 <Route path="/devices" element={<Devices />} />
-              {/* </Route> */}
             </Routes>
           </main>
         </div>

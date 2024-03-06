@@ -45,13 +45,14 @@ const Login = () => {
 
      
 
-      const { user, token } = response.data.payload;
+      const { user } = response.data.payload;
       updateUser(user);
       localStorage.setItem("userType" , user.userType )
       localStorage.setItem("userID" , user.id )
       localStorage.setItem("organization" , user.organization )
       localStorage.setItem("auth",true);
-      setAuth({ ...formData, accessToken: token, userRole: user.userType });
+      console.log(response.data.accessToken)
+      setAuth({ ...formData, accessToken: response.data.accessToken, userRole: user.userType });
 
 
       navigate("/dash", { replace: true });
