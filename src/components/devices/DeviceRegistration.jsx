@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
-import axios from "axios";
+import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
 import * as yup from 'yup';
 
@@ -12,12 +12,8 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   const [ownerType, setOwnerType] = useState("");
   const [clusterName, setClusterName] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
-  const [organization, setOrganization] = useState([]);
-  const [selectedOrg, setSelectedOrg] = useState("");
-  const [clusterBool, setClusterBool] = useState(false);
-  const userType = localStorage.getItem("userType");
-  const userID = localStorage.getItem("userID");
-  const userOrganization = localStorage.getItem("organization");
+
+
 
   const initialFormData = {
     devicename: "",
@@ -26,9 +22,10 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     mac_address: "",
     activeStatus: false,
     location: "",
-    device_owner_Type: userType, // Fixed typo here: "deivce_owner_Type" -> "device_owner_Type"
-    device_owner_id: userID, // Fixed typo here: "deivce_owner_id" -> "device_owner_id"
+    deivce_owner_Type: ownerType,
+    deivce_owner_id: ownerID,
   };
+
 
   const [deviceData, setDeviceData] = useState(initialFormData);
 
@@ -44,49 +41,47 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     }
   };
 
-  async function getDevicesCluster() {
-    let orgData;
-    if (userType === "Client") {
-      setSelectedOrg(userOrganization);
-      orgData = [{ organization: userOrganization }];
-    } else {
-      const response = await axios.get("http://localhost:5001/api/v1/getorg");
-      orgData = response.data;
-    }
-    setOrganization(orgData);
+  async function getDetails() {
+    axios
+      .get(`http://localhost:5001/api/v1/getcluster/owner/${ownerID}`)
+      .then((res) => {
+        setClusterName(res.data);
+        console.log(clusterName);
+        // setUser(res.data[0]);
+        // console.log(res.data[0].city);
+        // axios
+        //   .get(
+        //     `http://localhost:5000/api/v1/destinationFilter/${res.data[0].city}`
+        //   )
+        //   .then((res) => {
+        //     setDealer(res.data);
+        //     console.log(res.data);
+        //     localStorage.setItem("count", res.data.length);
+        //   });
+      });
   }
 
+  // useEffect(() => {
+  //   getDetails();
+  // }, []);
+
   useEffect(() => {
-    getDevicesCluster();
+    getDetails();
     setShow(showModal);
     if (showModal) {
+      // Reset deviceData when modal is shown
       determineOwnerType(ownerID);
       setDeviceData((prevData) => ({
         ...prevData,
-        device_owner_Type: ownerType, // Fixed typo here: "deivce_owner_Type" -> "device_owner_Type"
-        device_owner_id: ownerID, // Fixed typo here: "deivce_owner_id" -> "device_owner_id"
-        organization: selectedOrg
+        deivce_owner_Type: ownerType,
+        deivce_owner_id: ownerID,
       }));
     }
-  }, [showModal, ownerID, ownerType, selectedOrg]);
+  }, [showModal, ownerID, ownerType]);
 
   const handleClose = () => {
-    setSelectedOrg("");
-    setClusterName([]);
-    setClusterBool(false);
     setShow(false);
     handleCloseModal();
-  };
-
-  const handleOrganizationChange = async (e) => {
-    setSelectedOrg(e.target.value);
-    try {
-      const response = await axios.get(`http://localhost:5001/api/v1/getcluster/owner/${e.target.value}`);
-      setClusterName(response.data);
-      setClusterBool(true);
-    } catch (error) {
-      console.error("Error fetching clusters:", error);
-    }
   };
 
   const handleInputChange = (e) => {
@@ -188,19 +183,13 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
-                  <Form.Select
+                  <Form.Control
+                    type="text"
                     name="organization"
-                    value={selectedOrg}
-                    onChange={handleOrganizationChange}
+                    value={deviceData.organization}
+                    onChange={handleInputChange}
                     isInvalid={!!validationErrors.organization}
-                  >
-                    <option value="">Select Organization</option>
-                    {organization.map((org, index) => (
-                      <option key={index} value={org.organization}>
-                        {org.organization}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  />
                   <Form.Control.Feedback type="invalid">
                     {validationErrors.organization}
                   </Form.Control.Feedback>
@@ -224,6 +213,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
                 </Form.Group>
               </div>
             </div>
+
             <div className="row">
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="activeStatus">

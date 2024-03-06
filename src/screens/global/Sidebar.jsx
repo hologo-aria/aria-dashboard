@@ -7,15 +7,15 @@ import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
+import DragHandleIcon from '@mui/icons-material/DragHandle';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import DevicesIcon from "@mui/icons-material/Devices";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import { useUser } from "../../context/GlobalProvider";
+import DevicesIcon from '@mui/icons-material/Devices';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  
 
   return (
     <MenuItem
@@ -38,15 +38,10 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
-  const {userData} = useUser() ;
-  console.log(userData.userType)
-  const localStorageUserType = localStorage.getItem("userType");
-
-  const isClientUser = localStorageUserType === "Client"
-
   return (
     <Box
-      className="sidebar"
+
+    className="sidebar"
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
@@ -123,32 +118,29 @@ const Sidebar = () => {
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
-              to="/dash"
+              to="/"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
 
-            {!isClientUser && (
-              <>
-                <Item
-                  title="Manage Admins"
-                  to="/admin"
-                  icon={<AdminPanelSettingsIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                <Item
-                  title="Manage Clients"
-                  to="/team"
-                  icon={<PeopleOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-              </>
-            )}
+            <Item 
+              title="Manage Admins"
+              to="/admin"
+              icon={<AdminPanelSettingsIcon/>}
+              selected={selected}
+              setSelected={setSelected}  
+            />
 
-            {/* 
+            <Item
+              title="Manage Clients"
+              to="/team"
+              icon={<PeopleOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
+{/* 
                         <Item
               title="Manage Ad Owners"
               to="/team"
@@ -163,21 +155,24 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             /> */}
-            <Item
+            <Item 
               title="Manage Clusters"
               to="/cluster"
-              icon={<DragHandleIcon />}
+              icon={<DragHandleIcon/>}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> 
 
             <Item
-              title="Manage Devices"
-              to="/devices"
-              icon={<DevicesIcon />}
-              selected={selected}
-              setSelected={setSelected}
+
+            title="Manage Devices"
+            to="/devices"
+            icon={<DevicesIcon/>}
+            selected={selected}
+            setSelected={setSelected}
             />
+            
+
           </Box>
         </Menu>
       </ProSidebar>
