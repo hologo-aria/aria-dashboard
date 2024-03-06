@@ -135,8 +135,7 @@ function EditCluster({ showModal, handleCloseModal, clusterID }) {
                     name="activeStatus"
                     label="Active Status"
                     checked={clusterData.activeStatus}
-                   
-                    onChange={(e) => setClusterData({ ...clusterData, activeStatus: e.target.checked })} 
+                    onChange={handleInputChange}
                   />
                 </Form.Group>
               </div>

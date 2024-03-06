@@ -110,7 +110,6 @@ const Admin = () => {
             }
             borderRadius="4px"
           >
-            {accessLevel === "superadmin" && <AdminPanelSettingsOutlinedIcon />}
             {accessLevel === "admin" && <AdminPanelSettingsOutlinedIcon />}
             {accessLevel === "moderator" && <SecurityOutlinedIcon />}
             {accessLevel === "user" && <LockOpenOutlinedIcon />}
