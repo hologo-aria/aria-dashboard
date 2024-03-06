@@ -14,8 +14,6 @@ import AdminRegistration from "./components/admin/AdminRegistration";
 import Admin from "./screens/admin";
 import Login from "./screens/login";
 import RequireAuth from "./components/auth/RequireAuth";
-import "mdb-react-ui-kit/dist/css/mdb.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
   const [theme, colorMode] = useMode();
