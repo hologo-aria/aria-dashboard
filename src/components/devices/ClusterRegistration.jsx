@@ -4,15 +4,24 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
 
 function ClusterRegistration({ showModal, handleCloseModal }) {
   const [show, setShow] = useState(showModal);
   const [ownerID, setOwnerID] = useState("cli002");
   const [ownerType, setOwnerType] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const validationSchema = yup.object().shape({
+    clustername: yup.string().required("Cluster Name is required"),
+    organization: yup.string().required("Organization is required"),
+    location: yup.string().required("Location is required"),
+  });
+
   const [organization, setOrganization] = useState([]);
   const userType = localStorage.getItem("userType");
-  const userID = localStorage.getItem("userID")
-  const userOrganization = localStorage.getItem("organization")
+  const userID = localStorage.getItem("userID");
+  const userOrganization = localStorage.getItem("organization");
 
   const initialFormData = {
     clusterID: "clu001",
@@ -38,23 +47,20 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     }
   };
 
-
   async function getDevicesCluster() {
     let orgData;
     if (userType === "Client") {
       // If userType is "Client", set the selectedOrg to userOrganization
-    
+
       orgData = [{ organization: userOrganization }];
     } else {
       // If userType is not "Client", fetch organization data from the API
       const response = await axios.get("http://localhost:5001/api/v1/getorg");
       orgData = response.data;
     }
-  
+
     setOrganization(orgData);
   }
-
-
 
   useEffect(() => {
     getDevicesCluster();
@@ -77,6 +83,13 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    // Clear validation errors for the current input field
+    setValidationErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: undefined,
+    }));
+
     setClusterData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
@@ -85,16 +98,29 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
 
   const handleCreateCluster = async () => {
     try {
-      console.log(clusterData);
+      // Validate form data
+      await validationSchema.validate(clusterData, { abortEarly: false });
+
+      // If validation passes, make the API call
       const response = await axios.post(
         "http://localhost:5001/api/v1/cluster",
         clusterData
       );
+
       console.log("Cluster created successfully:", response.data);
       setClusterData(initialFormData);
       handleClose();
     } catch (error) {
-      console.error("Error creating cluster:", error);
+      if (error.name === "ValidationError") {
+        // Yup validation error
+        const errors = {};
+        error.inner.forEach((e) => {
+          errors[e.path] = e.message;
+        });
+        setValidationErrors(errors);
+      } else {
+        console.error("Error creating cluster:", error);
+      }
     }
   };
 
@@ -115,16 +141,22 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                     name="clustername"
                     value={clusterData.clustername}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.clustername}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.clustername}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
-              
+
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
                   <Form.Select
                     name="organization"
-                    value={clusterData.organization} onChange={handleInputChange}
+                    value={clusterData.organization}
+                    onChange={handleInputChange}
+                    isInvalid={!!validationErrors.organization}
                   >
                     <option value="all">Select Organization</option>
                     {organization.map((org, index) => (
@@ -133,9 +165,11 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                       </option>
                     ))}
                   </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.organization}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
-             
             </div>
             <div className="row">
               <div className="col-md-6">
@@ -146,11 +180,14 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                     name="location"
                     value={clusterData.location}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.location}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.location}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
-
             <div className="row">
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="activeStatus">
@@ -160,7 +197,11 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                     label="Active Status"
                     checked={clusterData.activeStatus}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.activeStatus}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.activeStatus}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
