@@ -14,10 +14,6 @@ import Devices from "./screens/device";
 import AdminRegistration from "./components/admin/AdminRegistration";
 import Admin from "./screens/admin";
 
-import Login from "./screens/login";
-import RequireAuth from "./components/auth/RequireAuth";
-
-
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);

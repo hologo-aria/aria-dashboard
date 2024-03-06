@@ -5,11 +5,13 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
+import * as yup from 'yup';
 
 function EditDevice({ showModal, handleCloseModal, deviceID }) {
   const [show, setShow] = useState(showModal);
   const [deviceData, setDeviceData] = useState([{}]); // State to store cluster data
   const navigate = useNavigate();
+  const [validationErrors, setValidationErrors] = useState({});
 
 
 
@@ -37,6 +39,7 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
   const handleClose = () => {
     setShow(false);
     handleCloseModal();
+    setValidationErrors({}); // Reset validation errors
   };
 
 
@@ -48,14 +51,34 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
     });
   };
 
+  const validationSchema = yup.object().shape({
+    devicename: yup.string().required('Device Name is required'),
+    clustername: yup.string().required('Cluster Name is required'),
+    organization: yup.string().required('Organization is required'),
+    mac_address: yup.string().required('MAC Address is required'),
+    location: yup.string().required('Location is required'),
+  });
+
   const handleSubmit = async () => {
-    axios
-      .put(`http://localhost:5001/api/v1/getdevice/${deviceID}`, deviceData)
-      .then((res) => {
-        handleClose();
-        console.log("Done and dusted");
-        navigate("/devices");
-      });
+    try {
+      await validationSchema.validate(deviceData, { abortEarly: false });
+
+      const response = await axios.put(`http://localhost:5001/api/v1/getdevice/${deviceID}`, deviceData);
+      console.log('Device updated successfully:', response.data);
+
+      handleClose();
+      navigate('/devices');
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        const errors = {};
+        error.inner.forEach((e) => {
+          errors[e.path] = e.message;
+        });
+        setValidationErrors(errors);
+      } else {
+        console.error('Error updating Device:', error);
+      }
+    }
   };
 
   if (!deviceData) {
@@ -80,6 +103,7 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="deviceID"
                     value={deviceData.deviceID}
                     onChange={handleInputChange}
+                    readOnly
                   />
                 </Form.Group>
               </div>
@@ -91,7 +115,11 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="devicename"
                     value={deviceData.devicename}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.devicename}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.devicename}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -104,7 +132,11 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="mac_address"
                     value={deviceData.mac_address}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.mac_address}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.mac_address}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
@@ -115,7 +147,11 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="clustername"
                     value={deviceData.clustername}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.clustername}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.clustername}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -128,7 +164,11 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="organization"
                     value={deviceData.organization}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.organization}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.organization}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col-md-6">
@@ -139,7 +179,11 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="location"
                     value={deviceData.location}
                     onChange={handleInputChange}
+                    isInvalid={!!validationErrors.location}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.location}
+                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
