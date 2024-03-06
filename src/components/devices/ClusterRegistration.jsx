@@ -4,21 +4,24 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios"; // Import axios for making HTTP requests
 import { useNavigate } from "react-router-dom";
-import * as yup from 'yup';
+import * as yup from "yup";
 
 function ClusterRegistration({ showModal, handleCloseModal }) {
   const [show, setShow] = useState(showModal);
-  const [ownerID, setOwnerID] = useState("cli001");
+  const [ownerID, setOwnerID] = useState("cli002");
   const [ownerType, setOwnerType] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
 
-
   const validationSchema = yup.object().shape({
-    clustername: yup.string().required('Cluster Name is required'),
-    organization: yup.string().required('Organization is required'),
-    location: yup.string().required('Location is required'),
+    clustername: yup.string().required("Cluster Name is required"),
+    organization: yup.string().required("Organization is required"),
+    location: yup.string().required("Location is required"),
   });
-  
+
+  const [organization, setOrganization] = useState([]);
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID");
+  const userOrganization = localStorage.getItem("organization");
 
   const initialFormData = {
     clusterID: "clu001",
@@ -26,8 +29,8 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     organization: "",
     location: "",
     activeStatus: false,
-    cluster_owner_Type: ownerType,
-    cluster_owner_id: ownerID,
+    cluster_owner_Type: userType,
+    cluster_owner_id: userID,
   };
 
   const [clusterData, setClusterData] = useState(initialFormData);
@@ -44,7 +47,23 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
     }
   };
 
+  async function getDevicesCluster() {
+    let orgData;
+    if (userType === "Client") {
+      // If userType is "Client", set the selectedOrg to userOrganization
+
+      orgData = [{ organization: userOrganization }];
+    } else {
+      // If userType is not "Client", fetch organization data from the API
+      const response = await axios.get("http://localhost:5001/api/v1/getorg");
+      orgData = response.data;
+    }
+
+    setOrganization(orgData);
+  }
+
   useEffect(() => {
+    getDevicesCluster();
     setShow(showModal);
     if (showModal) {
       // Reset clusterData when modal is shown
@@ -64,36 +83,35 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-  
+
     // Clear validation errors for the current input field
     setValidationErrors((prevErrors) => ({
       ...prevErrors,
       [name]: undefined,
     }));
-  
+
     setClusterData((prevData) => ({
       ...prevData,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-  
 
   const handleCreateCluster = async () => {
     try {
       // Validate form data
       await validationSchema.validate(clusterData, { abortEarly: false });
-  
+
       // If validation passes, make the API call
       const response = await axios.post(
         "http://localhost:5001/api/v1/cluster",
         clusterData
       );
-  
+
       console.log("Cluster created successfully:", response.data);
       setClusterData(initialFormData);
       handleClose();
     } catch (error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === "ValidationError") {
         // Yup validation error
         const errors = {};
         error.inner.forEach((e) => {
@@ -105,7 +123,6 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
       }
     }
   };
-  
 
   return (
     <>
@@ -131,16 +148,23 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
                   </Form.Control.Feedback>
                 </Form.Group>
               </div>
+
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Form.Select
                     name="organization"
                     value={clusterData.organization}
                     onChange={handleInputChange}
                     isInvalid={!!validationErrors.organization}
-                  />
+                  >
+                    <option value="all">Select Organization</option>
+                    {organization.map((org, index) => (
+                      <option key={index} value={org.organization}>
+                        {org.organization}
+                      </option>
+                    ))}
+                  </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {validationErrors.organization}
                   </Form.Control.Feedback>
@@ -194,7 +218,6 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
       </Modal>
     </>
   );
-  
 }
 
 export default ClusterRegistration;

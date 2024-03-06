@@ -195,7 +195,7 @@ function EditDevice({ showModal, handleCloseModal, deviceID }) {
                     name="activeStatus"
                     label="Active Status"
                     checked={deviceData.activeStatus}
-                    onChange={handleInputChange}
+                    onChange={(e) => setDeviceData({ ...deviceData, activeStatus: e.target.checked })} 
                   />
                 </Form.Group>
               </div>

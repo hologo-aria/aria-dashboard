@@ -21,6 +21,12 @@ function Devices() {
   const [deviceID, setDeviceID] = useState();
   const [showdeviceModal, setShowDeviceModal] = useState(false);
 
+  const userType = localStorage.getItem("userType");
+  const userID = localStorage.getItem("userID")
+  const userOrganization = localStorage.getItem("organization")
+
+
+
   const handleShowModal = () => {
     setShowModal(true);
   };
@@ -38,20 +44,45 @@ function Devices() {
     setShowDeviceModal(false);
   };
 
-  useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5001/api/v1/getdevice"
-        );
-        setDevice(response.data);
-      } catch (error) {
-        console.error("Error fetching devices:", error);
-      }
-    };
 
-    fetchDevices();
+  const fetchDevices = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5001/api/v1/getdevice"
+      );
+      setDevice(response.data);
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+    }
+  };
+
+
+  const fetchClientDevices = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5001/api/v1/getdevice/dash/${userOrganization}`)
+
+      setDevice(response.data);
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+    }
+  };
+
+
+  useEffect(() => {
+   
+    if(userType != "Admin")
+    {
+      fetchClientDevices()
+    }
+    else {
+
+      fetchDevices();
+    }
+
   }, [showModal, showdeviceModal]);
+
+
+
 
   const alertMsg = (clustername, deviceID) => {
     console.log(device[0].clustername);
