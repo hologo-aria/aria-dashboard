@@ -13,6 +13,7 @@ import AdminRegistration from "./components/admin/AdminRegistration";
 import Admin from "./screens/admin";
 import Login from "./screens/login";
 import RequireAuth from "./components/auth/RequireAuth";
+import ProtectedRoutes from "./utils/ProtectedRoutes";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -33,6 +34,7 @@ function App() {
             {showSidebarAndTopbar && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
               <Route path="/" element={<Login />} />
+              <Route element={<ProtectedRoutes />}>
                 <Route path="/dash" element={<Dashboard />} />
                 <Route path="/team" element={<Team />} />
                 <Route path="/team/client" element={<ClientRegistration />} />
@@ -40,6 +42,7 @@ function App() {
                 <Route path="/admin/reg" element={<AdminRegistration />} />
                 <Route path="/cluster" element={<Cluster />} />
                 <Route path="/devices" element={<Devices />} />
+              </Route>
             </Routes>
           </main>
         </div>

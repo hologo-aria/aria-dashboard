@@ -7,6 +7,7 @@ import axios from "../../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../context/useAuth";
 import { useUser } from "../../context/GlobalProvider";
+import "./../../assets/css/dashboard.css"
 
 const LOGIN_URL = "/auth";
 
@@ -50,10 +51,12 @@ const Login = () => {
       localStorage.setItem("userType" , user.userType )
       localStorage.setItem("userID" , user.id )
       localStorage.setItem("organization" , user.organization )
-      localStorage.setItem("auth",true);
       console.log(response.data.accessToken)
       setAuth({ ...formData, accessToken: response.data.accessToken, userRole: user.userType });
 
+      if(response.data.accessToken != null){
+        localStorage.setItem("auth",true);
+      }
 
       navigate("/dash", { replace: true });
     } catch (err) {
@@ -119,11 +122,11 @@ const Login = () => {
           />
           {error && <p style={{ color: "red" }}>{error}</p>}
           <Button
+          className="login-button"
             type="submit"
-            variant="contained"
-            color="primary"
+           
             size="large"
-            sx={{ marginTop: "20px" }}
+            sx={{ marginTop: "20px" , background:"#FF9B50" }}
           >
             Login
           </Button>

@@ -33,11 +33,11 @@ const Dashboard = () => {
   const userType = localStorage.getItem("userType");
   const userID = localStorage.getItem("userID")
   const userOrganization = localStorage.getItem("organization")
-  const auth = localStorage.getItem("auth");
+//   const auth = localStorage.getItem("auth");
 
-  if (!auth){
-navigate("/") 
- }
+//   if (!auth){
+// navigate("/") 
+//  }
 
   async function getDevicesCluster() {
     axios.all([

@@ -50,3 +50,16 @@
 .card-font-style{
     font-size: 40px;
 }
+
+
+.login-button {
+    background: "#FF9B50";
+    color: #FFF;
+    
+}
+
+.login-button:hover{
+    background:"#FFF";
+    color: "#FF9B50";
+    border: 2px solid #FF9B50;
+}

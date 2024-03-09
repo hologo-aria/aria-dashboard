@@ -23,3 +23,13 @@ export const SignInWrapper = styled.div`
         flex-direction: column;
     }
 `
+
+
+export const LoginButton = styled.button`
+    height: 30px;
+    width: 100px;
+    border-radius: 5px;
+    background: "#FF9B50";
+    padding: 5px;
+
+`

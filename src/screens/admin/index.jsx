@@ -26,11 +26,11 @@ const Admin = () => {
     setadminID(e);
     setShowModal(true);
   };
-  const auth = localStorage.getItem("auth");
+//   const auth = localStorage.getItem("auth");
 
-  if (!auth){
-navigate("/") 
- }
+//   if (!auth){
+// navigate("/") 
+//  }
 
 
 
@@ -194,7 +194,7 @@ navigate("/")
             color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.orangeAccent[400],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -202,7 +202,7 @@ navigate("/")
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.orangeAccent[400],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
@@ -213,7 +213,7 @@ navigate("/")
           <Link to="/admin/reg">
             <Button
               sx={{
-                backgroundColor: colors.blueAccent[700],
+                backgroundColor: colors.orangeAccent[400],
                 color: colors.grey[100],
                 fontSize: "14px",
                 fontWeight: "bold",
