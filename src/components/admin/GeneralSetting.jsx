@@ -13,17 +13,12 @@ import "./../../assets/css/generalSetting.css";
 
 const GeneralSetting = () => {
   const [showGeneralForm, setShowGeneralForm] = useState(true);
-  const [adminId, setAdminId] = useState("adm003");
   const [countryData, setCountryData] = useState();
   const [formErrors, setFormErrors] = useState({});
 
   const auth = localStorage.getItem("auth");
 
-  if (!auth) {
-    navigate("/");
-  }
 
-  const [cliID, setCliID] = useState("cli001");
 
   const alphanumericRegex = /^[a-zA-Z0-9\s.,#\/-]+$/;
 
@@ -73,28 +68,7 @@ const GeneralSetting = () => {
     accessLevel: Yup.string().required("Access level is required"),
   });
 
-  useEffect(() => {
-    var date = new Date();
-    var year = date.getUTCFullYear();
-    var month = date.getUTCMonth() + 1; // Months are zero-indexed
-    var day = date.getUTCDate();
-    var hours = date.getUTCHours();
-    var minutes = date.getUTCMinutes();
-    var seconds = date.getUTCSeconds();
-    var milliseconds = date.getUTCMilliseconds();
 
-    // Create a UTC timestamp from the individual components
-    var utcTimestamp = Date.UTC(
-      year,
-      month,
-      day,
-      hours,
-      minutes,
-      seconds,
-      milliseconds
-    );
-    setCliID("CLI" + utcTimestamp);
-  }, [cliID]);
 
   const fetchData = async () => {
     try {
@@ -108,7 +82,6 @@ const GeneralSetting = () => {
 
   const navigate = useNavigate();
   const initialFormData = {
-    adminID: adminId,
     firstname: "",
     lastname: "",
     organization: "",

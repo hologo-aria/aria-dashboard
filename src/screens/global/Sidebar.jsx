@@ -147,22 +147,6 @@ const Sidebar = () => {
                 />
               </>
             )}
-
-            {/* 
-                        <Item
-              title="Manage Ad Owners"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Contacts Information"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
             <Item
               title="Manage Clusters"
               to="/cluster"
