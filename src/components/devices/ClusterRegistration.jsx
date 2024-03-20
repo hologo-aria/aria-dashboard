@@ -8,9 +8,12 @@ import * as yup from 'yup';
 
 function ClusterRegistration({ showModal, handleCloseModal }) {
   const [show, setShow] = useState(showModal);
-  const [ownerID, setOwnerID] = useState("cli002");
+  const [ownerID, setOwnerID] = useState("");
   const [ownerType, setOwnerType] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
+
+
+
 
 
   const validationSchema = yup.object().shape({
@@ -25,7 +28,6 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
   const userOrganization = localStorage.getItem("organization")
 
   const initialFormData = {
-    clusterID: "clu001",
     clustername: "",
     organization: "",
     location: "",
@@ -39,13 +41,8 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
   const navigate = useNavigate();
 
   const determineOwnerType = (id) => {
-    if (id.startsWith("cli")) {
-      setOwnerType("Client");
-    } else if (id.startsWith("adm")) {
-      setOwnerType("Admin");
-    } else {
-      setOwnerType("");
-    }
+    setOwnerType(localStorage.getItem("userType"))
+    setOwnerID(localStorage.getItem("userID"))
   };
 
 
@@ -160,7 +157,11 @@ function ClusterRegistration({ showModal, handleCloseModal }) {
               <div className="col-md-6">
                 <Form.Group className="mb-3" controlId="organization">
                   <Form.Label>Organization</Form.Label>
-                <Form.Select>
+                <Form.Select 
+                    onChange={handleInputChange}
+                    name="organization"
+                    value={clusterData.organization}
+                >
                     <option value="">Select Organization</option>
                     {organization.map((org, index) => (
                       <option key={index} value={org.organization}>

@@ -16,8 +16,7 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   const [organization, setOrganization] = useState([]);
   const [selectedOrg, setSelectedOrg] = useState("");
   const [clusterBool , setClusterBool] = useState(false) // New state for selected organization
-  const userType = localStorage.getItem("userType");
-  const userID = localStorage.getItem("userID")
+
   const userOrganization = localStorage.getItem("organization")
 
 
@@ -28,8 +27,8 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
     mac_address: "",
     activeStatus: false,
     location: "",
-    deivce_owner_Type: userType,
-    deivce_owner_id: userID,
+    deivce_owner_Type: ownerType,
+    deivce_owner_id: ownerID,
   };
 
   const [deviceData, setDeviceData] = useState(initialFormData);
@@ -37,18 +36,13 @@ function DeviceRegistration({ showModal, handleCloseModal }) {
   const navigate = useNavigate();
 
   const determineOwnerType = (id) => {
-    if (id.startsWith("cli")) {
-      setOwnerType("Client");
-    } else if (id.startsWith("adm")) {
-      setOwnerType("Admin");
-    } else {
-      setOwnerType("");
-    }
+    setOwnerType(localStorage.getItem("userType"))
+    setOwnerID(localStorage.getItem("userID"))
   };
 
   async function getDevicesCluster() {
     let orgData;
-    if (userType === "Client") {
+    if (ownerType === "Client") {
       // If userType is "Client", set the selectedOrg to userOrganization
       setSelectedOrg(userOrganization);
       orgData = [{ organization: userOrganization }];

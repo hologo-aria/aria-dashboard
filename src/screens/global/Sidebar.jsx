@@ -41,7 +41,7 @@ const Sidebar = () => {
   const {userData} = useUser() ;
   console.log(userData.userType)
   const localStorageUserType = localStorage.getItem("userType");
-
+  const organization = localStorage.getItem("organization")
   const isClientUser = localStorageUserType === "Client"
 
   return (
@@ -111,7 +111,7 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Ed Roh
+                 {organization}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   VP Fancy Admin
